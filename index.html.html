@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BhandaraChalu</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#FF7722',secondary:'#FFC107'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Poppins', sans-serif;
+background-color: #FFFAF0;
+}
+.dropdown-content {
+display: none;
+position: absolute;
+background-color: white;
+min-width: 100%;
+box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+z-index: 50;
+border-radius: 8px;
+max-height: 200px;
+overflow-y: auto;
+}
+.dropdown-content.show {
+display: block;
+}
+.custom-select {
+position: relative;
+}
+</style>
+</head>
+<body class="bg-orange-50">
+<!-- Welcome Modal -->
+<div id="welcomeModal" class="fixed inset-0 flex items-center justify-center z-50">
+<div class="absolute inset-0 bg-black bg-opacity-50"></div>
+<div class="bg-white rounded-lg p-6 shadow-lg z-10 mx-4 w-full max-w-sm relative">
+<h3 class="text-xl font-semibold text-gray-900 mb-4">Welcome to BhandaraChalu</h3>
+<form id="welcomeForm" class="space-y-4">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+<input type="text" id="userName" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:border-primary text-sm" placeholder="Enter your name">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+<input type="email" id="userEmail" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:border-primary text-sm" placeholder="Enter your email">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
+<input type="tel" id="userMobile" required pattern="[0-9]{10}" class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:border-primary text-sm" placeholder="Enter 10-digit mobile number">
+</div>
+<button type="submit" class="w-full bg-primary text-white py-3 rounded-button font-medium">Get Started</button>
+</form>
+</div>
+</div>
+
+<!-- Share Modal -->
+<div id="shareModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+<div class="absolute inset-0 bg-black bg-opacity-50"></div>
+<div class="bg-white rounded-lg p-6 shadow-lg z-10 mx-4 w-full max-w-sm">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-lg font-semibold text-gray-900">Share Bhandara</h3>
+<button onclick="closeShareModal()" class="text-gray-400 hover:text-gray-500">
+<i class="ri-close-line ri-lg"></i>
+</button>
+</div>
+<div class="grid grid-cols-4 gap-4">
+<a href="#" class="flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-1">
+<i class="ri-whatsapp-fill ri-lg text-green-500"></i>
+</div>
+<span class="text-xs text-gray-600">WhatsApp</span>
+</a>
+<a href="#" class="flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-1">
+<i class="ri-facebook-fill ri-lg text-blue-600"></i>
+</div>
+<span class="text-xs text-gray-600">Facebook</span>
+</a>
+<a href="#" class="flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-1">
+<i class="ri-twitter-fill ri-lg text-blue-400"></i>
+</div>
+<span class="text-xs text-gray-600">Twitter</span>
+</a>
+<a href="#" class="flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-1">
+<i class="ri-telegram-fill ri-lg text-blue-500"></i>
+</div>
+<span class="text-xs text-gray-600">Telegram</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Nav Bar -->
+<nav class="fixed top-0 w-full bg-primary text-white shadow-md z-50">
+<div class="flex items-center justify-between px-4 py-3">
+<div class="flex items-center">
+<span class="text-xl font-['Pacifico'] mr-1">logo</span>
+<span class="font-semibold">BhandaraChalu</span>
+</div>
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 flex items-center justify-center cursor-pointer">
+<i class="ri-notification-3-line ri-lg"></i>
+</div>
+<div class="w-8 h-8 flex items-center justify-center cursor-pointer">
+<i class="ri-user-line ri-lg"></i>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="pt-16 pb-20 px-4">
+<!-- About Section -->
+<section class="mb-6 mt-4">
+<div class="bg-white rounded-lg shadow-sm p-4">
+<h2 class="text-lg font-semibold text-gray-800 mb-2">Welcome to BhandaraChalu</h2>
+<p class="text-gray-600 text-sm">Find free food (Bhandara) events happening near temples and spiritual centers across India. Connect with community and enjoy prasad.</p>
+<div class="mt-3 flex justify-center">
+<img src="https://readdy.ai/api/search-image?query=Traditional%20Indian%20thali%20food%20with%20various%20dishes%20arranged%20in%20a%20circular%20pattern%2C%20vibrant%20colors%2C%20authentic%20Indian%20cuisine%2C%20decorated%20with%20flower%20petals%2C%20festive%20presentation%2C%20spiritual%20offering%2C%20prasad%2C%20overhead%20view%2C%20professional%20food%20photography%2C%20soft%20natural%20lighting&width=350&height=180&seq=1&orientation=landscape" alt="Bhandara Food" class="rounded-lg w-full h-36 object-cover">
+</div>
+</div>
+</section>
+<!-- Find Bhandaras Section -->
+<section class="mb-6">
+<div class="bg-white rounded-lg shadow-sm p-4">
+<h2 class="text-lg font-semibold text-gray-800 mb-4">Find Bhandaras Near You</h2>
+<!-- Location Filter -->
+<div class="mb-4">
+<h3 class="text-sm font-medium text-gray-700 mb-2">Location</h3>
+<!-- State Dropdown -->
+<div class="custom-select mb-3">
+<button id="stateDropdownBtn" class="w-full flex items-center justify-between bg-gray-50 border border-gray-200 rounded-button px-3 py-2.5 text-sm text-gray-700 cursor-pointer">
+<span id="stateSelected">Select State</span>
+<i class="ri-arrow-down-s-line ri-lg"></i>
+</button>
+<div id="stateDropdown" class="dropdown-content w-full">
+<div class="p-2 border-b border-gray-100">
+<input type="text" placeholder="Search states..." class="w-full px-3 py-2 text-sm border border-gray-200 rounded-button focus:outline-none focus:border-primary">
+</div>
+<div class="py-1">
+<div class="px-3 py-2 hover:bg-orange-50 cursor-pointer text-sm" data-value="Delhi">Delhi</div>
+<div class="px-3 py-2 hover:bg-orange-50 cursor-pointer text-sm" data-value="Uttar Pradesh">Uttar Pradesh</div>
+<div class="px-3 py-2 hover:bg-orange-50 cursor-pointer text-sm" data-value="Bihar">Bihar</div>
+<div class="px-3 py-2 hover:bg-orange-50 cursor-pointer text-sm" data-value="Maharashtra">Maharashtra</div>
+<div class="px-3 py-2 hover:bg-orange-50 cursor-pointer text-sm" data-value="Gujarat">Gujarat</div>
+</div>
+</div>
+</div>
+<!-- District Dropdown (Hidden initially) -->
+<div id="districtContainer" class="custom-select mb-3 hidden">
+<button id="districtDropdownBtn" class="w-full flex items-center justify-between bg-gray-50 border border-gray-200 rounded-button px-3 py-2.5 text-sm text-gray-700 cursor-pointer">
+<span id="districtSelected">Select District</span>
+<i class="ri-arrow-down-s-line ri-lg"></i>
+</button>
+<div id="districtDropdown" class="dropdown-content w-full">
+<div class="p-2 border-b border-gray-100">
+<input type="text" placeholder="Search districts..." class="w-full px-3 py-2 text-sm border border-gray-200 rounded-button focus:outline-none focus:border-primary">
+</div>
+<div id="districtOptions" class="py-1">
+<!-- Districts will be populated dynamically -->
+</div>
+</div>
+</div>
+<!-- Area Dropdown (Hidden initially) -->
+<div id="areaContainer" class="custom-select mb-3 hidden">
+<button id="areaDropdownBtn" class="w-full flex items-center justify-between bg-gray-50 border border-gray-200 rounded-button px-3 py-2.5 text-sm text-gray-700 cursor-pointer">
+<span id="areaSelected">Select Area</span>
+<i class="ri-arrow-down-s-line ri-lg"></i>
+</button>
+<div id="areaDropdown" class="dropdown-content w-full">
+<div class="p-2 border-b border-gray-100">
+<input type="text" placeholder="Search areas..." class="w-full px-3 py-2 text-sm border border-gray-200 rounded-button focus:outline-none focus:border-primary">
+</div>
+<div id="areaOptions" class="py-1">
+<!-- Areas will be populated dynamically -->
+</div>
+</div>
+</div>
+</div>
+<!-- Timing Filter -->
+<div class="mb-5">
+<h3 class="text-sm font-medium text-gray-700 mb-2">Timing</h3>
+<div class="flex space-x-2">
+<button class="timing-btn flex-1 py-2 px-3 bg-white border border-gray-200 rounded-button text-sm flex items-center justify-center space-x-1 cursor-pointer" data-time="morning">
+<i class="ri-sun-line ri-lg text-yellow-500"></i>
+<span>Morning</span>
+</button>
+<button class="timing-btn flex-1 py-2 px-3 bg-white border border-gray-200 rounded-button text-sm flex items-center justify-center space-x-1 cursor-pointer" data-time="afternoon">
+<i class="ri-sun-foggy-line ri-lg text-orange-400"></i>
+<span>Afternoon</span>
+</button>
+<button class="timing-btn flex-1 py-2 px-3 bg-white border border-gray-200 rounded-button text-sm flex items-center justify-center space-x-1 cursor-pointer" data-time="evening">
+<i class="ri-moon-line ri-lg text-indigo-400"></i>
+<span>Evening</span>
+</button>
+</div>
+</div>
+<!-- Find Button -->
+<button id="findBhandaraBtn" class="w-full bg-primary text-white py-3 rounded-button font-medium flex items-center justify-center cursor-pointer">
+<i class="ri-search-line ri-lg mr-2"></i>
+Find Bhandara
+</button>
+</div>
+</section>
+<!-- Founder Section -->
+<section class="mb-6">
+<div class="bg-white rounded-lg shadow-sm p-4">
+<div class="flex items-center mb-4">
+<img src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20an%20Indian%20man%20in%20his%20early%2030s%20wearing%20a%20business%20casual%20outfit%2C%20warm%20smile%2C%20confident%20pose%2C%20studio%20lighting%2C%20high%20quality%20portrait&width=80&height=80&seq=2&orientation=squarish" alt="Roshan Gupta" class="w-20 h-20 rounded-full object-cover mr-4">
+<div>
+<h2 class="text-lg font-semibold text-gray-800">Meet Our Founder</h2>
+<p class="text-sm text-gray-600">Roshan Gupta</p>
+</div>
+</div>
+<p class="text-gray-600 text-sm leading-relaxed mb-4">
+As someone who grew up experiencing the warmth and unity of community gatherings around food, I was inspired to create BhandaraChalu. The idea came from seeing how technology could bridge the gap between those seeking spiritual nourishment and the temples offering prasad through bhandaras. Our mission is to ensure that this beautiful tradition of sharing food continues to thrive in our digital age.
+</p>
+<div class="flex space-x-3">
+<a href="#" class="text-primary hover:text-primary/80">
+<div class="w-8 h-8 flex items-center justify-center">
+<i class="ri-linkedin-fill ri-lg"></i>
+</div>
+</a>
+<a href="#" class="text-primary hover:text-primary/80">
+<div class="w-8 h-8 flex items-center justify-center">
+<i class="ri-twitter-fill ri-lg"></i>
+</div>
+</a>
+</div>
+</div>
+</section>
+
+<!-- Vision & Mission Section -->
+<section class="mb-6">
+<div class="bg-white rounded-lg shadow-sm p-4">
+<!-- Vision -->
+<div class="mb-6">
+<div class="flex items-center mb-3">
+<div class="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full mr-2">
+<i class="ri-eye-line ri-lg text-primary"></i>
+</div>
+<h2 class="text-lg font-semibold text-gray-800">Our Vision</h2>
+</div>
+<div class="pl-10">
+<p class="text-gray-600 text-sm leading-relaxed">
+To ensure that no one goes hungry by making free food events (Bhandaras) easily discoverable. We aim to blend tradition with technology, promoting a culture of seva, unity, and compassion across India.
+</p>
+</div>
+</div>
+<!-- Mission -->
+<div>
+<div class="flex items-center mb-3">
+<div class="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full mr-2">
+<i class="ri-flag-line ri-lg text-primary"></i>
+</div>
+<h2 class="text-lg font-semibold text-gray-800">Our Mission</h2>
+</div>
+<div class="pl-10">
+<p class="text-gray-600 text-sm leading-relaxed">
+To build a user-friendly platform that connects people with real-time community food events near temples and spiritual centers. Through BhandaraChalu, we aim to create awareness, increase participation, and strengthen community bonds.
+</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Results Section (Hidden initially) -->
+<section id="resultsSection" class="mb-6 hidden">
+<div class="flex items-center justify-between mb-3">
+<h2 class="text-lg font-semibold text-gray-800">Bhandaras Found</h2>
+<div class="flex items-center space-x-2">
+<button class="view-toggle-btn bg-gray-100 px-2 py-1 rounded-button text-xs flex items-center justify-center cursor-pointer active" data-view="list">
+<i class="ri-list-check-2 ri-lg mr-1"></i>
+List
+</button>
+<button class="view-toggle-btn bg-gray-100 px-2 py-1 rounded-button text-xs flex items-center justify-center cursor-pointer" data-view="map">
+<i class="ri-map-pin-line ri-lg mr-1"></i>
+Map
+</button>
+</div>
+</div>
+<!-- List View -->
+<div id="listView" class="space-y-3">
+<!-- Bhandara Card 1 -->
+<div class="bg-white rounded-lg shadow-sm p-4">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-medium text-gray-800">Shiv Mandir Bhandara</h3>
+<p class="text-xs text-gray-500 mt-1">Rajendra Nagar, Sahibabad</p>
+</div>
+<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Now</span>
+</div>
+<div class="flex items-center mt-2 text-xs text-gray-600">
+<i class="ri-time-line ri-lg mr-1"></i>
+<span>11:00 AM - 2:00 PM</span>
+</div>
+<div class="flex items-center mt-1 text-xs text-gray-600">
+<i class="ri-calendar-line ri-lg mr-1"></i>
+<span>Today, April 12, 2025</span>
+</div>
+<div class="flex items-center mt-1 text-xs text-gray-600">
+<i class="ri-restaurant-line ri-lg mr-1"></i>
+<span>Puri, Sabzi, Kheer, Halwa</span>
+</div>
+<div class="flex mt-3 space-x-2">
+<button onclick="openGoogleMaps('Sahibabad, Ghaziabad, Uttar Pradesh')" class="flex-1 bg-blue-50 text-blue-600 py-1.5 rounded-button text-xs flex items-center justify-center cursor-pointer">
+<i class="ri-route-line ri-lg mr-1"></i>
+Directions
+</button>
+<button onclick="openShareModal()" class="flex-1 bg-gray-50 text-gray-600 py-1.5 rounded-button text-xs flex items-center justify-center cursor-pointer">
+<i class="ri-share-line ri-lg mr-1"></i>
+Share
+</button>
+</div>
+</div>
+<!-- Bhandara Card 2 -->
+<div class="bg-white rounded-lg shadow-sm p-4">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-medium text-gray-800">Hanuman Temple Bhandara</h3>
+<p class="text-xs text-gray-500 mt-1">Ganeshpuri, Sahibabad</p>
+</div>
+<span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">Upcoming</span>
+</div>
+<div class="flex items-center mt-2 text-xs text-gray-600">
+<i class="ri-time-line ri-lg mr-1"></i>
+<span>5:00 PM - 8:00 PM</span>
+</div>
+<div class="flex items-center mt-1 text-xs text-gray-600">
+<i class="ri-calendar-line ri-lg mr-1"></i>
+<span>Today, April 12, 2025</span>
+</div>
+<div class="flex items-center mt-1 text-xs text-gray-600">
+<i class="ri-restaurant-line ri-lg mr-1"></i>
+<span>Chhole, Puri, Raita, Kheer</span>
+</div>
+<div class="flex mt-3 space-x-2">
+<button onclick="openGoogleMaps('Sahibabad, Ghaziabad, Uttar Pradesh')" class="flex-1 bg-blue-50 text-blue-600 py-1.5 rounded-button text-xs flex items-center justify-center cursor-pointer">
+<i class="ri-route-line ri-lg mr-1"></i>
+Directions
+</button>
+<button onclick="openShareModal()" class="flex-1 bg-gray-50 text-gray-600 py-1.5 rounded-button text-xs flex items-center justify-center cursor-pointer">
+<i class="ri-share-line ri-lg mr-1"></i>
+Share
+</button>
+</div>
+</div>
+<!-- Bhandara Card 3 -->
+<div class="bg-white rounded-lg shadow-sm p-4">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-medium text-gray-800">Krishna Temple Bhandara</h3>
+<p class="text-xs text-gray-500 mt-1">Rajendra Nagar, Sahibabad</p>
+</div>
+<span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">Tomorrow</span>
+</div>
+<div class="flex items-center mt-2 text-xs text-gray-600">
+<i class="ri-time-line ri-lg mr-1"></i>
+<span>12:00 PM - 3:00 PM</span>
+</div>
+<div class="flex items-center mt-1 text-xs text-gray-600">
+<i class="ri-calendar-line ri-lg mr-1"></i>
+<span>April 13, 2025</span>
+</div>
+<div class="flex items-center mt-1 text-xs text-gray-600">
+<i class="ri-restaurant-line ri-lg mr-1"></i>
+<span>Pulao, Paneer, Roti, Gulab Jamun</span>
+</div>
+<div class="flex mt-3 space-x-2">
+<button onclick="openGoogleMaps('Sahibabad, Ghaziabad, Uttar Pradesh')" class="flex-1 bg-blue-50 text-blue-600 py-1.5 rounded-button text-xs flex items-center justify-center cursor-pointer">
+<i class="ri-route-line ri-lg mr-1"></i>
+Directions
+</button>
+<button onclick="openShareModal()" class="flex-1 bg-gray-50 text-gray-600 py-1.5 rounded-button text-xs flex items-center justify-center cursor-pointer">
+<i class="ri-share-line ri-lg mr-1"></i>
+Share
+</button>
+</div>
+</div>
+</div>
+<!-- Map View (Hidden initially) -->
+<div id="mapView" class="hidden">
+<div class="bg-white rounded-lg shadow-sm p-4 h-64 relative overflow-hidden">
+<img src="https://public.readdy.ai/gen_page/map_placeholder_1280x720.png" alt="Map" class="absolute inset-0 w-full h-full object-cover">
+<div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
+<div class="bg-white p-3 rounded-lg shadow-lg">
+<p class="text-sm font-medium">3 Bhandaras Found</p>
+<p class="text-xs text-gray-500">Tap on markers to view details</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Tab Bar -->
+<div class="fixed bottom-0 w-full bg-white border-t border-gray-200 shadow-md z-50">
+<div class="grid grid-cols-4 h-16">
+<div class="flex flex-col items-center justify-center cursor-pointer text-primary">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-home-5-fill ri-lg"></i>
+</div>
+<span class="text-xs mt-1">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center cursor-pointer text-gray-500">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-map-pin-line ri-lg"></i>
+</div>
+<span class="text-xs mt-1">Explore</span>
+</div>
+<div class="flex flex-col items-center justify-center cursor-pointer text-gray-500">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-calendar-line ri-lg"></i>
+</div>
+<span class="text-xs mt-1">Events</span>
+</div>
+<div class="flex flex-col items-center justify-center cursor-pointer text-gray-500">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-user-line ri-lg"></i>
+</div>
+<span class="text-xs mt-1">Profile</span>
+</div>
+</div>
+</div>
+<script>
+function openGoogleMaps(location) {
+const encodedLocation = encodeURIComponent(location);
+window.open(`https://www.google.com/maps/search/?api=1&query=${encodedLocation}`, '_blank');
+}
+
+function openShareModal() {
+document.getElementById('shareModal').classList.remove('hidden');
+}
+
+function closeShareModal() {
+document.getElementById('shareModal').classList.add('hidden');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+// Welcome Modal Form Handling
+const welcomeModal = document.getElementById('welcomeModal');
+const welcomeForm = document.getElementById('welcomeForm');
+
+welcomeForm.addEventListener('submit', function(e) {
+e.preventDefault();
+const name = document.getElementById('userName').value;
+const email = document.getElementById('userEmail').value;
+const mobile = document.getElementById('userMobile').value;
+
+// Here you would typically send this data to your backend
+console.log('User details:', { name, email, mobile });
+
+// Hide the welcome modal
+welcomeModal.style.display = 'none';
+});
+// Location data
+const locationData = {
+"Delhi": {
+districts: ["North Delhi", "South Delhi", "East Delhi", "West Delhi", "Central Delhi"],
+areas: {
+"North Delhi": ["Rohini", "Model Town", "Ashok Vihar", "Pitampura"],
+"South Delhi": ["Saket", "Hauz Khas", "Green Park", "Malviya Nagar"],
+"East Delhi": ["Laxmi Nagar", "Mayur Vihar", "Preet Vihar", "Shahdara"],
+"West Delhi": ["Janakpuri", "Dwarka", "Paschim Vihar", "Rajouri Garden"],
+"Central Delhi": ["Connaught Place", "Karol Bagh", "Paharganj", "New Delhi"]
+}
+},
+"Uttar Pradesh": {
+districts: ["Ghaziabad", "Noida", "Varanasi", "Lucknow", "Agra"],
+areas: {
+"Ghaziabad": ["Sahibabad", "Rajendra Nagar", "Ganeshpuri", "Indirapuram", "Vaishali"],
+"Noida": ["Sector 18", "Sector 62", "Sector 125", "Sector 142", "Greater Noida"],
+"Varanasi": ["Dashashwamedh", "Godowlia", "Lanka", "Assi", "Bhelupur"],
+"Lucknow": ["Hazratganj", "Gomti Nagar", "Aliganj", "Indira Nagar", "Chowk"],
+"Agra": ["Tajganj", "Sadar Bazaar", "Sikandra", "Kamla Nagar", "Civil Lines"]
+}
+},
+"Bihar": {
+districts: ["Patna", "Gaya", "Muzaffarpur", "Bhagalpur", "Darbhanga"],
+areas: {
+"Patna": ["Patna City", "Danapur", "Phulwari Sharif", "Kankarbagh", "Rajendra Nagar"],
+"Gaya": ["Bodh Gaya", "AP Colony", "Manpur", "Civil Lines", "Gaya Town"],
+"Muzaffarpur": ["Mithanpura", "Brahampura", "Juran Chapra", "Saraiya", "Bela"],
+"Bhagalpur": ["Tilkamanjhi", "Nathnagar", "Barari", "Ishakchak", "Sabour"],
+"Darbhanga": ["Laheriasarai", "Lalbagh", "Donar", "Allalpatti", "Mirzapur"]
+}
+}
+};
+// Dropdown functionality
+function setupDropdown(btnId, dropdownId) {
+const btn = document.getElementById(btnId);
+const dropdown = document.getElementById(dropdownId);
+btn.addEventListener('click', function() {
+dropdown.classList.toggle('show');
+});
+// Close dropdown when clicking outside
+window.addEventListener('click', function(e) {
+if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
+dropdown.classList.remove('show');
+}
+});
+}
+setupDropdown('stateDropdownBtn', 'stateDropdown');
+setupDropdown('districtDropdownBtn', 'districtDropdown');
+setupDropdown('areaDropdownBtn', 'areaDropdown');
+// State selection
+const stateOptions = document.querySelectorAll('#stateDropdown [data-value]');
+stateOptions.forEach(option => {
+option.addEventListener('click', function() {
+const state = this.getAttribute('data-value');
+document.getElementById('stateSelected').textContent = state;
+document.getElementById('stateDropdown').classList.remove('show');
+// Show district dropdown and populate options
+document.getElementById('districtContainer').classList.remove('hidden');
+document.getElementById('districtSelected').textContent = 'Select District';
+document.getElementById('areaContainer').classList.add('hidden');
+const districtOptions = document.getElementById('districtOptions');
+districtOptions.innerHTML = '';
+locationData[state].districts.forEach(district => {
+const div = document.createElement('div');
+div.className = 'px-3 py-2 hover:bg-orange-50 cursor-pointer text-sm';
+div.setAttribute('data-value', district);
+div.textContent = district;
+div.addEventListener('click', function() {
+const selectedDistrict = this.getAttribute('data-value');
+document.getElementById('districtSelected').textContent = selectedDistrict;
+document.getElementById('districtDropdown').classList.remove('show');
+// Show area dropdown and populate options
+document.getElementById('areaContainer').classList.remove('hidden');
+document.getElementById('areaSelected').textContent = 'Select Area';
+const areaOptions = document.getElementById('areaOptions');
+areaOptions.innerHTML = '';
+locationData[state].areas[selectedDistrict].forEach(area => {
+const areaDiv = document.createElement('div');
+areaDiv.className = 'px-3 py-2 hover:bg-orange-50 cursor-pointer text-sm';
+areaDiv.setAttribute('data-value', area);
+areaDiv.textContent = area;
+areaDiv.addEventListener('click', function() {
+document.getElementById('areaSelected').textContent = this.getAttribute('data-value');
+document.getElementById('areaDropdown').classList.remove('show');
+});
+areaOptions.appendChild(areaDiv);
+});
+});
+districtOptions.appendChild(div);
+});
+});
+});
+// Timing filter
+const timingBtns = document.querySelectorAll('.timing-btn');
+timingBtns.forEach(btn => {
+btn.addEventListener('click', function() {
+timingBtns.forEach(b => b.classList.remove('bg-primary', 'text-white'));
+timingBtns.forEach(b => b.classList.add('bg-white', 'border-gray-200'));
+this.classList.remove('bg-white', 'border-gray-200');
+this.classList.add('bg-primary', 'text-white');
+});
+});
+// Find Bhandara button
+document.getElementById('findBhandaraBtn').addEventListener('click', function() {
+const state = document.getElementById('stateSelected').textContent;
+const district = document.getElementById('districtSelected').textContent;
+const area = document.getElementById('areaSelected').textContent;
+if (state === 'Select State') {
+const customAlert = document.createElement('div');
+customAlert.className = 'fixed inset-0 flex items-center justify-center z-50';
+customAlert.innerHTML = `
+<div class="absolute inset-0 bg-black bg-opacity-50"></div>
+<div class="bg-white rounded-lg p-4 shadow-lg z-10 mx-4 w-full max-w-xs">
+<div class="text-center">
+<div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-3">
+<i class="ri-error-warning-line ri-xl text-orange-500"></i>
+</div>
+<h3 class="text-lg font-medium text-gray-900 mb-2">Location Required</h3>
+<p class="text-sm text-gray-600 mb-4">Please select a state to find Bhandaras.</p>
+<button class="bg-primary text-white py-2 px-4 rounded-button w-full">OK</button>
+</div>
+</div>
+`;
+document.body.appendChild(customAlert);
+customAlert.querySelector('button').addEventListener('click', function() {
+document.body.removeChild(customAlert);
+});
+return;
+}
+// Show results section
+document.getElementById('resultsSection').classList.remove('hidden');
+// Scroll to results
+document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+});
+// Toggle between list and map views
+const viewToggleBtns = document.querySelectorAll('.view-toggle-btn');
+viewToggleBtns.forEach(btn => {
+btn.addEventListener('click', function() {
+viewToggleBtns.forEach(b => b.classList.remove('active', 'bg-primary', 'text-white'));
+viewToggleBtns.forEach(b => b.classList.add('bg-gray-100'));
+this.classList.remove('bg-gray-100');
+this.classList.add('active', 'bg-primary', 'text-white');
+const view = this.getAttribute('data-view');
+if (view === 'list') {
+document.getElementById('listView').classList.remove('hidden');
+document.getElementById('mapView').classList.add('hidden');
+} else {
+document.getElementById('listView').classList.add('hidden');
+document.getElementById('mapView').classList.remove('hidden');
+}
+});
+});
+});
+</script>
+</body>
+</html>
