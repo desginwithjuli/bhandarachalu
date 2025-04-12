@@ -36,29 +36,40 @@ position: relative;
 </style>
 </head>
 <body class="bg-orange-50">
-<!-- Welcome Modal -->
-<div id="welcomeModal" class="fixed inset-0 flex items-center justify-center z-50">
+<!-- Donate Modal -->
+<div id="donateModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
 <div class="absolute inset-0 bg-black bg-opacity-50"></div>
-<div class="bg-white rounded-lg p-6 shadow-lg z-10 mx-4 w-full max-w-sm relative">
-<h3 class="text-xl font-semibold text-gray-900 mb-4">Welcome to BhandaraChalu</h3>
-<form id="welcomeForm" class="space-y-4">
-<div>
-<label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-<input type="text" id="userName" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:border-primary text-sm" placeholder="Enter your name">
+<div class="bg-white rounded-lg p-6 shadow-lg z-10 mx-4 w-full max-w-sm">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-lg font-semibold text-gray-900">Support Our Mission</h3>
+<button onclick="closeDonateModal()" class="text-gray-400 hover:text-gray-500">
+<i class="ri-close-line ri-lg"></i>
+</button>
 </div>
-<div>
-<label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-<input type="email" id="userEmail" required class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:border-primary text-sm" placeholder="Enter your email">
+<p class="text-sm text-gray-600 mb-4">Your contribution helps us maintain and improve our platform, ensuring more people can connect with sacred food offerings.</p>
+<div class="grid grid-cols-3 gap-3 mb-4">
+<button class="bg-primary/10 text-primary py-2 px-3 rounded-button text-sm font-medium" onclick="selectAmount(101)">₹101</button>
+<button class="bg-primary/10 text-primary py-2 px-3 rounded-button text-sm font-medium" onclick="selectAmount(501)">₹501</button>
+<button class="bg-primary/10 text-primary py-2 px-3 rounded-button text-sm font-medium" onclick="selectAmount(1001)">₹1001</button>
 </div>
-<div>
-<label class="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
-<input type="tel" id="userMobile" required pattern="[0-9]{10}" class="w-full px-3 py-2 border border-gray-300 rounded-button focus:outline-none focus:border-primary text-sm" placeholder="Enter 10-digit mobile number">
+<div class="mb-4">
+<input type="number" id="customAmount" placeholder="Enter custom amount" class="w-full px-3 py-2 border border-gray-200 rounded-button text-sm focus:outline-none focus:border-primary" onchange="selectAmount(this.value)">
 </div>
-<button type="submit" class="w-full bg-primary text-white py-3 rounded-button font-medium">Get Started</button>
-</form>
+<div class="grid grid-cols-2 gap-3 mb-4">
+<button class="flex items-center justify-center bg-[#00A0E4] text-white py-3 rounded-button">
+<i class="ri-paypal-fill ri-lg mr-2"></i>
+PayPal
+</button>
+<button class="flex items-center justify-center bg-[#072654] text-white py-3 rounded-button">
+<i class="ri-bank-card-fill ri-lg mr-2"></i>
+Card
+</button>
+</div>
+<div class="text-xs text-gray-500 text-center">
+All donations are secure and encrypted
 </div>
 </div>
-
+</div>
 <!-- Share Modal -->
 <div id="shareModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
 <div class="absolute inset-0 bg-black bg-opacity-50"></div>
@@ -119,10 +130,54 @@ position: relative;
 <!-- About Section -->
 <section class="mb-6 mt-4">
 <div class="bg-white rounded-lg shadow-sm p-4">
-<h2 class="text-lg font-semibold text-gray-800 mb-2">Welcome to BhandaraChalu</h2>
-<p class="text-gray-600 text-sm">Find free food (Bhandara) events happening near temples and spiritual centers across India. Connect with community and enjoy prasad.</p>
-<div class="mt-3 flex justify-center">
-<img src="https://readdy.ai/api/search-image?query=Traditional%20Indian%20thali%20food%20with%20various%20dishes%20arranged%20in%20a%20circular%20pattern%2C%20vibrant%20colors%2C%20authentic%20Indian%20cuisine%2C%20decorated%20with%20flower%20petals%2C%20festive%20presentation%2C%20spiritual%20offering%2C%20prasad%2C%20overhead%20view%2C%20professional%20food%20photography%2C%20soft%20natural%20lighting&width=350&height=180&seq=1&orientation=landscape" alt="Bhandara Food" class="rounded-lg w-full h-36 object-cover">
+<div class="flex items-center justify-between mb-4">
+<div>
+<h2 class="text-xl font-semibold text-gray-800 mb-1">Welcome to BhandaraChalu</h2>
+<p class="text-sm text-gray-500">Connecting Communities Through Sacred Food</p>
+</div>
+<div class="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-full">
+<i class="ri-heart-fill ri-lg text-primary"></i>
+</div>
+</div>
+<div class="relative h-48 mb-4 rounded-lg overflow-hidden">
+<img src="https://readdy.ai/api/search-image?query=Traditional%20Indian%20temple%20prasad%20distribution%20scene%2C%20devotees%20receiving%20food%2C%20warm%20lighting%2C%20spiritual%20atmosphere%2C%20authentic%20cultural%20setting%2C%20professional%20photography%2C%20high%20resolution&width=400&height=200&seq=1&orientation=landscape" alt="Bhandara Scene" class="w-full h-full object-cover">
+<div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+<div class="text-white">
+<p class="text-sm font-medium">Serving 100+ Temples</p>
+<p class="text-xs">Across 20+ Cities in India</p>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-4 mb-4">
+<div class="bg-orange-50 p-3 rounded-lg text-center">
+<div class="text-primary font-semibold mb-1">50K+</div>
+<div class="text-xs text-gray-600">Daily Visitors</div>
+</div>
+<div class="bg-orange-50 p-3 rounded-lg text-center">
+<div class="text-primary font-semibold mb-1">200+</div>
+<div class="text-xs text-gray-600">Events/Day</div>
+</div>
+<div class="bg-orange-50 p-3 rounded-lg text-center">
+<div class="text-primary font-semibold mb-1">1M+</div>
+<div class="text-xs text-gray-600">Meals Served</div>
+</div>
+</div>
+<p class="text-gray-600 text-sm leading-relaxed">BhandaraChalu is India's first digital platform dedicated to connecting devotees with temple food offerings (prasad). We help you discover and participate in sacred food distribution events, fostering community spirit and spiritual well-being.</p>
+<div class="mt-4 flex space-x-3">
+<div class="flex-1 bg-primary/10 rounded-lg p-3">
+<div class="flex items-center mb-2">
+<i class="ri-shield-check-line ri-lg text-primary mr-2"></i>
+<span class="text-sm font-medium text-gray-800">Verified Events</span>
+</div>
+<p class="text-xs text-gray-600">All events are verified by our team for authenticity</p>
+</div>
+<div class="flex-1 bg-primary/10 rounded-lg p-3">
+<div class="flex items-center mb-2">
+<i class="ri-map-pin-line ri-lg text-primary mr-2"></i>
+<span class="text-sm font-medium text-gray-800">Real-time Updates</span>
+</div>
+<p class="text-xs text-gray-600">Live status and timing updates for all events</p>
+</div>
 </div>
 </div>
 </section>
@@ -235,7 +290,6 @@ As someone who grew up experiencing the warmth and unity of community gatherings
 </div>
 </div>
 </section>
-
 <!-- Vision & Mission Section -->
 <section class="mb-6">
 <div class="bg-white rounded-lg shadow-sm p-4">
@@ -399,7 +453,7 @@ Share
 </main>
 <!-- Tab Bar -->
 <div class="fixed bottom-0 w-full bg-white border-t border-gray-200 shadow-md z-50">
-<div class="grid grid-cols-4 h-16">
+<div class="grid grid-cols-5 h-16">
 <div class="flex flex-col items-center justify-center cursor-pointer text-primary">
 <div class="w-6 h-6 flex items-center justify-center">
 <i class="ri-home-5-fill ri-lg"></i>
@@ -411,6 +465,12 @@ Share
 <i class="ri-map-pin-line ri-lg"></i>
 </div>
 <span class="text-xs mt-1">Explore</span>
+</div>
+<div class="flex flex-col items-center justify-center cursor-pointer text-gray-500" onclick="openDonateModal()">
+<div class="w-8 h-8 flex items-center justify-center bg-primary rounded-full">
+<i class="ri-heart-fill ri-lg text-white"></i>
+</div>
+<span class="text-xs mt-1 text-primary font-medium">Donate</span>
 </div>
 <div class="flex flex-col items-center justify-center cursor-pointer text-gray-500">
 <div class="w-6 h-6 flex items-center justify-center">
@@ -431,32 +491,24 @@ function openGoogleMaps(location) {
 const encodedLocation = encodeURIComponent(location);
 window.open(`https://www.google.com/maps/search/?api=1&query=${encodedLocation}`, '_blank');
 }
-
 function openShareModal() {
 document.getElementById('shareModal').classList.remove('hidden');
 }
-
 function closeShareModal() {
 document.getElementById('shareModal').classList.add('hidden');
 }
-
+// Donation Modal Functions
+function openDonateModal() {
+document.getElementById('donateModal').classList.remove('hidden');
+}
+function closeDonateModal() {
+document.getElementById('donateModal').classList.add('hidden');
+}
+function selectAmount(amount) {
+const customInput = document.getElementById('customAmount');
+customInput.value = amount;
+}
 document.addEventListener('DOMContentLoaded', function() {
-// Welcome Modal Form Handling
-const welcomeModal = document.getElementById('welcomeModal');
-const welcomeForm = document.getElementById('welcomeForm');
-
-welcomeForm.addEventListener('submit', function(e) {
-e.preventDefault();
-const name = document.getElementById('userName').value;
-const email = document.getElementById('userEmail').value;
-const mobile = document.getElementById('userMobile').value;
-
-// Here you would typically send this data to your backend
-console.log('User details:', { name, email, mobile });
-
-// Hide the welcome modal
-welcomeModal.style.display = 'none';
-});
 // Location data
 const locationData = {
 "Delhi": {
@@ -565,6 +617,7 @@ document.getElementById('findBhandaraBtn').addEventListener('click', function() 
 const state = document.getElementById('stateSelected').textContent;
 const district = document.getElementById('districtSelected').textContent;
 const area = document.getElementById('areaSelected').textContent;
+const selectedTime = document.querySelector('.timing-btn.bg-primary')?.getAttribute('data-time');
 if (state === 'Select State') {
 const customAlert = document.createElement('div');
 customAlert.className = 'fixed inset-0 flex items-center justify-center z-50';
