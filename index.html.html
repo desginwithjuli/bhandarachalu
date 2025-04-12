@@ -3,665 +3,1211 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BhandaraChalu</title>
+<title>VideoShare - Share Your World</title>
 <script src="https://cdn.tailwindcss.com/3.4.16"></script>
-<script>tailwind.config={theme:{extend:{colors:{primary:'#FF7722',secondary:'#FFC107'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#3b82f6',secondary:'#f59e0b'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
 <style>
 :where([class^="ri-"])::before { content: "\f3c2"; }
 body {
-font-family: 'Poppins', sans-serif;
-background-color: #FFFAF0;
+font-family: 'Inter', sans-serif;
+background-color: #f9fafb;
 }
-.dropdown-content {
-display: none;
+.video-card:hover .video-duration {
+opacity: 0;
+}
+.video-card:hover .video-actions {
+opacity: 1;
+}
+.video-actions {
+opacity: 0;
+transition: opacity 0.3s ease;
+}
+.video-duration {
+transition: opacity 0.3s ease;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+.custom-scrollbar::-webkit-scrollbar {
+width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+background-color: rgba(156, 163, 175, 0.5);
+border-radius: 20px;
+}
+.switch-input {
+height: 0;
+width: 0;
+visibility: hidden;
 position: absolute;
-background-color: white;
-min-width: 100%;
-box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-z-index: 50;
-border-radius: 8px;
-max-height: 200px;
-overflow-y: auto;
 }
-.dropdown-content.show {
-display: block;
-}
-.custom-select {
+.switch-label {
+display: flex;
+align-items: center;
+justify-content: space-between;
+cursor: pointer;
+width: 50px;
+height: 24px;
+background: #e5e7eb;
+border-radius: 100px;
 position: relative;
+transition: background-color 0.2s;
+}
+.switch-label:after {
+content: "";
+position: absolute;
+top: 2px;
+left: 2px;
+width: 20px;
+height: 20px;
+background: #fff;
+border-radius: 90px;
+transition: 0.3s;
+box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.switch-input:checked + .switch-label {
+background: #3b82f6;
+}
+.switch-input:checked + .switch-label:after {
+left: calc(100% - 2px);
+transform: translateX(-100%);
 }
 </style>
 </head>
-<body class="bg-orange-50">
-<!-- Donate Modal -->
-<div id="donateModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
-<div class="absolute inset-0 bg-black bg-opacity-50"></div>
-<div class="bg-white rounded-lg p-6 shadow-lg z-10 mx-4 w-full max-w-sm">
-<div class="flex justify-between items-center mb-4">
-<h3 class="text-lg font-semibold text-gray-900">Support Our Mission</h3>
-<button onclick="closeDonateModal()" class="text-gray-400 hover:text-gray-500">
-<i class="ri-close-line ri-lg"></i>
+<body>
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+<div class="flex items-center justify-between px-4 py-2 md:px-6">
+<!-- Left section: Logo and sidebar toggle -->
+<div class="flex items-center gap-4">
+<button id="sidebar-toggle" class="p-2 text-gray-500 rounded-full hover:bg-gray-100 md:hidden">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-menu-line text-xl"></i>
+</div>
 </button>
-</div>
-<p class="text-sm text-gray-600 mb-4">Your contribution helps us maintain and improve our platform, ensuring more people can connect with sacred food offerings.</p>
-<div class="grid grid-cols-3 gap-3 mb-4">
-<button class="bg-primary/10 text-primary py-2 px-3 rounded-button text-sm font-medium" onclick="selectAmount(101)">₹101</button>
-<button class="bg-primary/10 text-primary py-2 px-3 rounded-button text-sm font-medium" onclick="selectAmount(501)">₹501</button>
-<button class="bg-primary/10 text-primary py-2 px-3 rounded-button text-sm font-medium" onclick="selectAmount(1001)">₹1001</button>
-</div>
-<div class="mb-4">
-<input type="number" id="customAmount" placeholder="Enter custom amount" class="w-full px-3 py-2 border border-gray-200 rounded-button text-sm focus:outline-none focus:border-primary" onchange="selectAmount(this.value)">
-</div>
-<div class="grid grid-cols-2 gap-3 mb-4">
-<button class="flex items-center justify-center bg-[#00A0E4] text-white py-3 rounded-button">
-<i class="ri-paypal-fill ri-lg mr-2"></i>
-PayPal
-</button>
-<button class="flex items-center justify-center bg-[#072654] text-white py-3 rounded-button">
-<i class="ri-bank-card-fill ri-lg mr-2"></i>
-Card
-</button>
-</div>
-<div class="text-xs text-gray-500 text-center">
-All donations are secure and encrypted
-</div>
-</div>
-</div>
-<!-- Share Modal -->
-<div id="shareModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
-<div class="absolute inset-0 bg-black bg-opacity-50"></div>
-<div class="bg-white rounded-lg p-6 shadow-lg z-10 mx-4 w-full max-w-sm">
-<div class="flex justify-between items-center mb-4">
-<h3 class="text-lg font-semibold text-gray-900">Share Bhandara</h3>
-<button onclick="closeShareModal()" class="text-gray-400 hover:text-gray-500">
-<i class="ri-close-line ri-lg"></i>
-</button>
-</div>
-<div class="grid grid-cols-4 gap-4">
-<a href="#" class="flex flex-col items-center">
-<div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-1">
-<i class="ri-whatsapp-fill ri-lg text-green-500"></i>
-</div>
-<span class="text-xs text-gray-600">WhatsApp</span>
-</a>
-<a href="#" class="flex flex-col items-center">
-<div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-1">
-<i class="ri-facebook-fill ri-lg text-blue-600"></i>
-</div>
-<span class="text-xs text-gray-600">Facebook</span>
-</a>
-<a href="#" class="flex flex-col items-center">
-<div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-1">
-<i class="ri-twitter-fill ri-lg text-blue-400"></i>
-</div>
-<span class="text-xs text-gray-600">Twitter</span>
-</a>
-<a href="#" class="flex flex-col items-center">
-<div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-1">
-<i class="ri-telegram-fill ri-lg text-blue-500"></i>
-</div>
-<span class="text-xs text-gray-600">Telegram</span>
+<a href="#" class="flex items-center gap-2">
+<span class="text-2xl font-['Pacifico'] text-primary">logo</span>
 </a>
 </div>
+<!-- Middle section: Search -->
+<div class="hidden md:flex flex-1 max-w-2xl mx-4">
+<div class="relative w-full">
+<input type="text" placeholder="Search videos, channels, or topics" class="w-full h-10 pl-4 pr-12 text-sm bg-gray-100 border-none rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white">
+<button class="absolute right-0 p-2 text-gray-500 rounded-full top-1/2 transform -translate-y-1/2">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-search-line"></i>
+</div>
+</button>
 </div>
 </div>
-<!-- Nav Bar -->
-<nav class="fixed top-0 w-full bg-primary text-white shadow-md z-50">
-<div class="flex items-center justify-between px-4 py-3">
-<div class="flex items-center">
-<span class="text-xl font-['Pacifico'] mr-1">logo</span>
-<span class="font-semibold">BhandaraChalu</span>
+<!-- Right section: Actions -->
+<div class="flex items-center gap-2 md:gap-4">
+<button class="p-2 text-gray-700 rounded-full hover:bg-gray-100 md:hidden">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-search-line"></i>
 </div>
-<div class="flex items-center space-x-3">
-<div class="w-8 h-8 flex items-center justify-center cursor-pointer">
-<i class="ri-notification-3-line ri-lg"></i>
+</button>
+<div class="hidden md:flex items-center">
+<input type="checkbox" id="theme-switch" class="switch-input">
+<label for="theme-switch" class="switch-label">
+<span class="sr-only">Dark mode</span>
+</label>
 </div>
-<div class="w-8 h-8 flex items-center justify-center cursor-pointer">
-<i class="ri-user-line ri-lg"></i>
+<button class="hidden md:flex p-2 text-gray-700 rounded-full hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-video-upload-line"></i>
 </div>
+</button>
+<button class="p-2 text-gray-700 rounded-full hover:bg-gray-100 relative">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-notification-3-line"></i>
+</div>
+<span class="absolute top-0 right-0 flex items-center justify-center w-4 h-4 text-xs text-white bg-red-500 rounded-full">3</span>
+</button>
+<div class="relative group">
+<button class="flex items-center justify-center w-8 h-8 overflow-hidden rounded-full bg-primary text-white">
+<span class="text-sm font-medium">JD</span>
+</button>
+<div class="absolute right-0 hidden mt-2 w-48 bg-white rounded shadow-lg border border-gray-200 group-hover:block">
+<div class="p-3 border-b border-gray-200">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center">
+<span class="text-sm font-medium">JD</span>
+</div>
+<div>
+<p class="font-medium text-gray-900">John Doe</p>
+<p class="text-xs text-gray-500">john.doe@example.com</p>
+</div>
+</div>
+</div>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Channel</a>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Studio</a>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+<div class="border-t border-gray-200"></div>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Mobile search (hidden by default) -->
+<div class="px-4 py-2 md:hidden hidden" id="mobile-search">
+<div class="relative w-full">
+<input type="text" placeholder="Search videos, channels, or topics" class="w-full h-10 pl-4 pr-12 text-sm bg-gray-100 border-none rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white">
+<button class="absolute right-0 p-2 text-gray-500 rounded-full top-1/2 transform -translate-y-1/2">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-search-line"></i>
+</div>
+</button>
+</div>
+</div>
+</header>
+<div class="flex min-h-screen">
+<!-- Sidebar -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 pt-16 pb-4 overflow-y-auto transition-transform duration-300 bg-white border-r border-gray-200 md:translate-x-0 -translate-x-full custom-scrollbar">
+<nav class="px-4 mt-4">
+<div class="space-y-1">
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-primary rounded-md bg-blue-50">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-home-line"></i>
+</div>
+<span>Home</span>
+</a>
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-fire-line"></i>
+</div>
+<span>Trending</span>
+</a>
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-video-line"></i>
+</div>
+<span>Subscriptions</span>
+</a>
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-history-line"></i>
+</div>
+<span>History</span>
+</a>
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-time-line"></i>
+</div>
+<span>Watch Later</span>
+</a>
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-thumb-up-line"></i>
+</div>
+<span>Liked Videos</span>
+</a>
+</div>
+<div class="mt-6 pt-6 border-t border-gray-200">
+<h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Subscriptions</h3>
+<div class="mt-3 space-y-1">
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center rounded-full bg-red-500 text-white text-xs">
+TC
+</div>
+<span>Tech Channel</span>
+</a>
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center rounded-full bg-purple-500 text-white text-xs">
+MH
+</div>
+<span>Music Hub</span>
+</a>
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center rounded-full bg-green-500 text-white text-xs">
+CK
+</div>
+<span>Cooking King</span>
+</a>
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center rounded-full bg-yellow-500 text-white text-xs">
+FT
+</div>
+<span>Fitness Trainer</span>
+</a>
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center rounded-full bg-blue-500 text-white text-xs">
+TT
+</div>
+<span>Travel Tips</span>
+</a>
+</div>
+</div>
+<div class="mt-6 pt-6 border-t border-gray-200">
+<h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Explore</h3>
+<div class="mt-3 space-y-1">
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-film-line"></i>
+</div>
+<span>Movies</span>
+</a>
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-gamepad-line"></i>
+</div>
+<span>Gaming</span>
+</a>
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-live-line"></i>
+</div>
+<span>Live</span>
+</a>
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-fashion-line"></i>
+</div>
+<span>Fashion</span>
+</a>
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-book-open-line"></i>
+</div>
+<span>Learning</span>
+</a>
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-music-2-line"></i>
+</div>
+<span>Music</span>
+</a>
+</div>
+</div>
+<div class="mt-6 pt-6 border-t border-gray-200">
+<div class="space-y-1">
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-settings-3-line"></i>
+</div>
+<span>Settings</span>
+</a>
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-flag-line"></i>
+</div>
+<span>Report history</span>
+</a>
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-question-line"></i>
+</div>
+<span>Help</span>
+</a>
+<a href="#" class="flex items-center gap-4 px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-feedback-line"></i>
+</div>
+<span>Send feedback</span>
+</a>
 </div>
 </div>
 </nav>
-<!-- Main Content -->
-<main class="pt-16 pb-20 px-4">
-<!-- About Section -->
-<section class="mb-6 mt-4">
-<div class="bg-white rounded-lg shadow-sm p-4">
-<div class="flex items-center justify-between mb-4">
-<div>
-<h2 class="text-xl font-semibold text-gray-800 mb-1">Welcome to BhandaraChalu</h2>
-<p class="text-sm text-gray-500">Connecting Communities Through Sacred Food</p>
-</div>
-<div class="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-full">
-<i class="ri-heart-fill ri-lg text-primary"></i>
-</div>
-</div>
-<div class="relative h-48 mb-4 rounded-lg overflow-hidden">
-<img src="https://readdy.ai/api/search-image?query=Traditional%20Indian%20temple%20prasad%20distribution%20scene%2C%20devotees%20receiving%20food%2C%20warm%20lighting%2C%20spiritual%20atmosphere%2C%20authentic%20cultural%20setting%2C%20professional%20photography%2C%20high%20resolution&width=400&height=200&seq=1&orientation=landscape" alt="Bhandara Scene" class="w-full h-full object-cover">
-<div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-<div class="text-white">
-<p class="text-sm font-medium">Serving 100+ Temples</p>
-<p class="text-xs">Across 20+ Cities in India</p>
-</div>
-</div>
-</div>
-<div class="grid grid-cols-3 gap-4 mb-4">
-<div class="bg-orange-50 p-3 rounded-lg text-center">
-<div class="text-primary font-semibold mb-1">50K+</div>
-<div class="text-xs text-gray-600">Daily Visitors</div>
-</div>
-<div class="bg-orange-50 p-3 rounded-lg text-center">
-<div class="text-primary font-semibold mb-1">200+</div>
-<div class="text-xs text-gray-600">Events/Day</div>
-</div>
-<div class="bg-orange-50 p-3 rounded-lg text-center">
-<div class="text-primary font-semibold mb-1">1M+</div>
-<div class="text-xs text-gray-600">Meals Served</div>
-</div>
-</div>
-<p class="text-gray-600 text-sm leading-relaxed">BhandaraChalu is India's first digital platform dedicated to connecting devotees with temple food offerings (prasad). We help you discover and participate in sacred food distribution events, fostering community spirit and spiritual well-being.</p>
-<div class="mt-4 flex space-x-3">
-<div class="flex-1 bg-primary/10 rounded-lg p-3">
-<div class="flex items-center mb-2">
-<i class="ri-shield-check-line ri-lg text-primary mr-2"></i>
-<span class="text-sm font-medium text-gray-800">Verified Events</span>
-</div>
-<p class="text-xs text-gray-600">All events are verified by our team for authenticity</p>
-</div>
-<div class="flex-1 bg-primary/10 rounded-lg p-3">
-<div class="flex items-center mb-2">
-<i class="ri-map-pin-line ri-lg text-primary mr-2"></i>
-<span class="text-sm font-medium text-gray-800">Real-time Updates</span>
-</div>
-<p class="text-xs text-gray-600">Live status and timing updates for all events</p>
-</div>
-</div>
-</div>
-</section>
-<!-- Find Bhandaras Section -->
-<section class="mb-6">
-<div class="bg-white rounded-lg shadow-sm p-4">
-<h2 class="text-lg font-semibold text-gray-800 mb-4">Find Bhandaras Near You</h2>
-<!-- Location Filter -->
-<div class="mb-4">
-<h3 class="text-sm font-medium text-gray-700 mb-2">Location</h3>
-<!-- State Dropdown -->
-<div class="custom-select mb-3">
-<button id="stateDropdownBtn" class="w-full flex items-center justify-between bg-gray-50 border border-gray-200 rounded-button px-3 py-2.5 text-sm text-gray-700 cursor-pointer">
-<span id="stateSelected">Select State</span>
-<i class="ri-arrow-down-s-line ri-lg"></i>
-</button>
-<div id="stateDropdown" class="dropdown-content w-full">
-<div class="p-2 border-b border-gray-100">
-<input type="text" placeholder="Search states..." class="w-full px-3 py-2 text-sm border border-gray-200 rounded-button focus:outline-none focus:border-primary">
-</div>
-<div class="py-1">
-<div class="px-3 py-2 hover:bg-orange-50 cursor-pointer text-sm" data-value="Delhi">Delhi</div>
-<div class="px-3 py-2 hover:bg-orange-50 cursor-pointer text-sm" data-value="Uttar Pradesh">Uttar Pradesh</div>
-<div class="px-3 py-2 hover:bg-orange-50 cursor-pointer text-sm" data-value="Bihar">Bihar</div>
-<div class="px-3 py-2 hover:bg-orange-50 cursor-pointer text-sm" data-value="Maharashtra">Maharashtra</div>
-<div class="px-3 py-2 hover:bg-orange-50 cursor-pointer text-sm" data-value="Gujarat">Gujarat</div>
-</div>
-</div>
-</div>
-<!-- District Dropdown (Hidden initially) -->
-<div id="districtContainer" class="custom-select mb-3 hidden">
-<button id="districtDropdownBtn" class="w-full flex items-center justify-between bg-gray-50 border border-gray-200 rounded-button px-3 py-2.5 text-sm text-gray-700 cursor-pointer">
-<span id="districtSelected">Select District</span>
-<i class="ri-arrow-down-s-line ri-lg"></i>
-</button>
-<div id="districtDropdown" class="dropdown-content w-full">
-<div class="p-2 border-b border-gray-100">
-<input type="text" placeholder="Search districts..." class="w-full px-3 py-2 text-sm border border-gray-200 rounded-button focus:outline-none focus:border-primary">
-</div>
-<div id="districtOptions" class="py-1">
-<!-- Districts will be populated dynamically -->
-</div>
-</div>
-</div>
-<!-- Area Dropdown (Hidden initially) -->
-<div id="areaContainer" class="custom-select mb-3 hidden">
-<button id="areaDropdownBtn" class="w-full flex items-center justify-between bg-gray-50 border border-gray-200 rounded-button px-3 py-2.5 text-sm text-gray-700 cursor-pointer">
-<span id="areaSelected">Select Area</span>
-<i class="ri-arrow-down-s-line ri-lg"></i>
-</button>
-<div id="areaDropdown" class="dropdown-content w-full">
-<div class="p-2 border-b border-gray-100">
-<input type="text" placeholder="Search areas..." class="w-full px-3 py-2 text-sm border border-gray-200 rounded-button focus:outline-none focus:border-primary">
-</div>
-<div id="areaOptions" class="py-1">
-<!-- Areas will be populated dynamically -->
-</div>
-</div>
-</div>
-</div>
-<!-- Timing Filter -->
-<div class="mb-5">
-<h3 class="text-sm font-medium text-gray-700 mb-2">Timing</h3>
+</aside>
+<!-- Main content -->
+<main class="flex-1 pt-16 md:ml-64">
+<!-- Category chips -->
+<div class="sticky top-16 z-10 bg-white border-b border-gray-200 px-4 py-3 md:px-6 overflow-x-auto whitespace-nowrap">
 <div class="flex space-x-2">
-<button class="timing-btn flex-1 py-2 px-3 bg-white border border-gray-200 rounded-button text-sm flex items-center justify-center space-x-1 cursor-pointer" data-time="morning">
-<i class="ri-sun-line ri-lg text-yellow-500"></i>
-<span>Morning</span>
+<button class="px-4 py-1.5 text-sm font-medium text-white bg-primary rounded-full !rounded-button whitespace-nowrap">All</button>
+<button class="px-4 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-full !rounded-button hover:bg-gray-200 whitespace-nowrap">Music</button>
+<button class="px-4 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-full !rounded-button hover:bg-gray-200 whitespace-nowrap">Gaming</button>
+<button class="px-4 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-full !rounded-button hover:bg-gray-200 whitespace-nowrap">News</button>
+<button class="px-4 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-full !rounded-button hover:bg-gray-200 whitespace-nowrap">Live</button>
+<button class="px-4 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-full !rounded-button hover:bg-gray-200 whitespace-nowrap">Technology</button>
+<button class="px-4 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-full !rounded-button hover:bg-gray-200 whitespace-nowrap">Cooking</button>
+<button class="px-4 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-full !rounded-button hover:bg-gray-200 whitespace-nowrap">Travel</button>
+<button class="px-4 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-full !rounded-button hover:bg-gray-200 whitespace-nowrap">Sports</button>
+<button class="px-4 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-full !rounded-button hover:bg-gray-200 whitespace-nowrap">Fashion</button>
+<button class="px-4 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-full !rounded-button hover:bg-gray-200 whitespace-nowrap">Beauty</button>
+</div>
+</div>
+<!-- Featured video -->
+<div class="p-4 md:p-6">
+<div class="relative rounded-lg overflow-hidden shadow-md">
+<img src="https://readdy.ai/api/search-image?query=modern%20tech%20workspace%20with%20multiple%20screens%20showing%20video%20editing%20software%2C%20professional%20camera%20equipment%20on%20desk%2C%20soft%20lighting%2C%20cinematic%20atmosphere%2C%20high%20quality&width=1280&height=720&seq=1&orientation=landscape" alt="Featured video" class="w-full h-[300px] md:h-[400px] object-cover object-top">
+<div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-4 md:p-6">
+<div class="max-w-3xl">
+<span class="inline-block px-2 py-1 text-xs font-medium text-white bg-red-600 rounded mb-2">FEATURED</span>
+<h2 class="text-xl md:text-2xl font-bold text-white mb-2">Ultimate Guide to Professional Video Editing - Advanced Techniques for Creators</h2>
+<div class="flex items-center text-white/80 text-sm mb-3">
+<span>1.2M views</span>
+<span class="mx-2">•</span>
+<span>2 days ago</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white text-xs">
+PC
+</div>
+<span class="text-sm font-medium text-white">Pro Creators</span>
+</div>
+<button class="px-4 py-1.5 text-sm font-medium text-white bg-primary rounded-full !rounded-button hover:bg-primary/90 whitespace-nowrap">Watch Now</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recommended videos -->
+<div class="p-4 md:p-6">
+<h2 class="text-xl font-bold text-gray-900 mb-4">Recommended</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+<!-- Video card 1 -->
+<div class="video-card group rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=person%20explaining%20tech%20gadget%20to%20camera%2C%20professional%20lighting%2C%20tech%20review%20setup%2C%20high%20quality%20camera%20angle%2C%20detailed%20product%20visible&width=640&height=360&seq=2&orientation=landscape" alt="Video thumbnail" class="w-full aspect-video object-cover object-top">
+<span class="video-duration absolute bottom-2 right-2 px-1.5 py-0.5 text-xs font-medium text-white bg-black/80 rounded">12:34</span>
+<div class="video-actions absolute inset-0 bg-black/20 flex items-center justify-center gap-2">
+<button class="play-video p-2 text-white bg-black/50 rounded-full hover:bg-black/70" data-video-id="1_WaSnOnu1Q">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-play-fill"></i>
+</div>
 </button>
-<button class="timing-btn flex-1 py-2 px-3 bg-white border border-gray-200 rounded-button text-sm flex items-center justify-center space-x-1 cursor-pointer" data-time="afternoon">
-<i class="ri-sun-foggy-line ri-lg text-orange-400"></i>
-<span>Afternoon</span>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-time-line"></i>
+</div>
 </button>
-<button class="timing-btn flex-1 py-2 px-3 bg-white border border-gray-200 rounded-button text-sm flex items-center justify-center space-x-1 cursor-pointer" data-time="evening">
-<i class="ri-moon-line ri-lg text-indigo-400"></i>
-<span>Evening</span>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-playlist-add-line"></i>
+</div>
 </button>
 </div>
 </div>
-<!-- Find Button -->
-<button id="findBhandaraBtn" class="w-full bg-primary text-white py-3 rounded-button font-medium flex items-center justify-center cursor-pointer">
-<i class="ri-search-line ri-lg mr-2"></i>
-Find Bhandara
-</button>
+<div class="p-3">
+<div class="flex gap-3">
+<div class="flex-shrink-0">
+<div class="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs">
+TR
 </div>
-</section>
-<!-- Founder Section -->
-<section class="mb-6">
-<div class="bg-white rounded-lg shadow-sm p-4">
-<div class="flex items-center mb-4">
-<img src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20an%20Indian%20man%20in%20his%20early%2030s%20wearing%20a%20business%20casual%20outfit%2C%20warm%20smile%2C%20confident%20pose%2C%20studio%20lighting%2C%20high%20quality%20portrait&width=80&height=80&seq=2&orientation=squarish" alt="Roshan Gupta" class="w-20 h-20 rounded-full object-cover mr-4">
+</div>
 <div>
-<h2 class="text-lg font-semibold text-gray-800">Meet Our Founder</h2>
-<p class="text-sm text-gray-600">Roshan Gupta</p>
+<h3 class="font-medium text-gray-900 line-clamp-2 mb-1">New iPhone 15 Pro Review - Is It Worth The Upgrade?</h3>
+<p class="text-sm text-gray-600">Tech Reviews</p>
+<div class="flex items-center text-xs text-gray-500 mt-1">
+<span>845K views</span>
+<span class="mx-1">•</span>
+<span>3 days ago</span>
 </div>
 </div>
-<p class="text-gray-600 text-sm leading-relaxed mb-4">
-As someone who grew up experiencing the warmth and unity of community gatherings around food, I was inspired to create BhandaraChalu. The idea came from seeing how technology could bridge the gap between those seeking spiritual nourishment and the temples offering prasad through bhandaras. Our mission is to ensure that this beautiful tradition of sharing food continues to thrive in our digital age.
-</p>
-<div class="flex space-x-3">
-<a href="#" class="text-primary hover:text-primary/80">
-<div class="w-8 h-8 flex items-center justify-center">
-<i class="ri-linkedin-fill ri-lg"></i>
-</div>
-</a>
-<a href="#" class="text-primary hover:text-primary/80">
-<div class="w-8 h-8 flex items-center justify-center">
-<i class="ri-twitter-fill ri-lg"></i>
-</div>
-</a>
 </div>
 </div>
-</section>
-<!-- Vision & Mission Section -->
-<section class="mb-6">
-<div class="bg-white rounded-lg shadow-sm p-4">
-<!-- Vision -->
-<div class="mb-6">
-<div class="flex items-center mb-3">
-<div class="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full mr-2">
-<i class="ri-eye-line ri-lg text-primary"></i>
 </div>
-<h2 class="text-lg font-semibold text-gray-800">Our Vision</h2>
+<!-- Video card 2 -->
+<div class="video-card group rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=cooking%20scene%20in%20modern%20kitchen%2C%20chef%20preparing%20gourmet%20meal%2C%20professional%20lighting%2C%20food%20photography%20setup%2C%20vibrant%20ingredients&width=640&height=360&seq=3&orientation=landscape" alt="Video thumbnail" class="w-full aspect-video object-cover object-top">
+<span class="video-duration absolute bottom-2 right-2 px-1.5 py-0.5 text-xs font-medium text-white bg-black/80 rounded">18:22</span>
+<div class="video-actions absolute inset-0 bg-black/20 flex items-center justify-center gap-2">
+<button class="play-video p-2 text-white bg-black/50 rounded-full hover:bg-black/70" data-video-id="1_WaSnOnu1Q">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-play-fill"></i>
 </div>
-<div class="pl-10">
-<p class="text-gray-600 text-sm leading-relaxed">
-To ensure that no one goes hungry by making free food events (Bhandaras) easily discoverable. We aim to blend tradition with technology, promoting a culture of seva, unity, and compassion across India.
-</p>
+</button>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-time-line"></i>
+</div>
+</button>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-playlist-add-line"></i>
+</div>
+</button>
 </div>
 </div>
-<!-- Mission -->
+<div class="p-3">
+<div class="flex gap-3">
+<div class="flex-shrink-0">
+<div class="w-9 h-9 rounded-full bg-green-500 flex items-center justify-center text-white text-xs">
+CK
+</div>
+</div>
 <div>
-<div class="flex items-center mb-3">
-<div class="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full mr-2">
-<i class="ri-flag-line ri-lg text-primary"></i>
-</div>
-<h2 class="text-lg font-semibold text-gray-800">Our Mission</h2>
-</div>
-<div class="pl-10">
-<p class="text-gray-600 text-sm leading-relaxed">
-To build a user-friendly platform that connects people with real-time community food events near temples and spiritual centers. Through BhandaraChalu, we aim to create awareness, increase participation, and strengthen community bonds.
-</p>
+<h3 class="font-medium text-gray-900 line-clamp-2 mb-1">5 Gourmet Meals You Can Make In Under 30 Minutes</h3>
+<p class="text-sm text-gray-600">Cooking King</p>
+<div class="flex items-center text-xs text-gray-500 mt-1">
+<span>1.3M views</span>
+<span class="mx-1">•</span>
+<span>1 week ago</span>
 </div>
 </div>
 </div>
-</section>
-<!-- Results Section (Hidden initially) -->
-<section id="resultsSection" class="mb-6 hidden">
-<div class="flex items-center justify-between mb-3">
-<h2 class="text-lg font-semibold text-gray-800">Bhandaras Found</h2>
-<div class="flex items-center space-x-2">
-<button class="view-toggle-btn bg-gray-100 px-2 py-1 rounded-button text-xs flex items-center justify-center cursor-pointer active" data-view="list">
-<i class="ri-list-check-2 ri-lg mr-1"></i>
-List
+</div>
+</div>
+<!-- Video card 3 -->
+<div class="video-card group rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=fitness%20trainer%20demonstrating%20workout%20routine%20in%20modern%20gym%2C%20professional%20lighting%2C%20exercise%20demonstration%2C%20athletic%20person%2C%20high%20quality&width=640&height=360&seq=4&orientation=landscape" alt="Video thumbnail" class="w-full aspect-video object-cover object-top">
+<span class="video-duration absolute bottom-2 right-2 px-1.5 py-0.5 text-xs font-medium text-white bg-black/80 rounded">25:47</span>
+<div class="video-actions absolute inset-0 bg-black/20 flex items-center justify-center gap-2">
+<button class="play-video p-2 text-white bg-black/50 rounded-full hover:bg-black/70" data-video-id="1_WaSnOnu1Q">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-play-fill"></i>
+</div>
 </button>
-<button class="view-toggle-btn bg-gray-100 px-2 py-1 rounded-button text-xs flex items-center justify-center cursor-pointer" data-view="map">
-<i class="ri-map-pin-line ri-lg mr-1"></i>
-Map
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-time-line"></i>
+</div>
+</button>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-playlist-add-line"></i>
+</div>
 </button>
 </div>
 </div>
-<!-- List View -->
-<div id="listView" class="space-y-3">
-<!-- Bhandara Card 1 -->
-<div class="bg-white rounded-lg shadow-sm p-4">
-<div class="flex justify-between items-start">
+<div class="p-3">
+<div class="flex gap-3">
+<div class="flex-shrink-0">
+<div class="w-9 h-9 rounded-full bg-yellow-500 flex items-center justify-center text-white text-xs">
+FT
+</div>
+</div>
 <div>
-<h3 class="font-medium text-gray-800">Shiv Mandir Bhandara</h3>
-<p class="text-xs text-gray-500 mt-1">Rajendra Nagar, Sahibabad</p>
+<h3 class="font-medium text-gray-900 line-clamp-2 mb-1">Complete Home Workout Routine - No Equipment Needed</h3>
+<p class="text-sm text-gray-600">Fitness Trainer</p>
+<div class="flex items-center text-xs text-gray-500 mt-1">
+<span>2.7M views</span>
+<span class="mx-1">•</span>
+<span>2 weeks ago</span>
 </div>
-<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Now</span>
 </div>
-<div class="flex items-center mt-2 text-xs text-gray-600">
-<i class="ri-time-line ri-lg mr-1"></i>
-<span>11:00 AM - 2:00 PM</span>
 </div>
-<div class="flex items-center mt-1 text-xs text-gray-600">
-<i class="ri-calendar-line ri-lg mr-1"></i>
-<span>Today, April 12, 2025</span>
 </div>
-<div class="flex items-center mt-1 text-xs text-gray-600">
-<i class="ri-restaurant-line ri-lg mr-1"></i>
-<span>Puri, Sabzi, Kheer, Halwa</span>
 </div>
-<div class="flex mt-3 space-x-2">
-<button onclick="openGoogleMaps('Sahibabad, Ghaziabad, Uttar Pradesh')" class="flex-1 bg-blue-50 text-blue-600 py-1.5 rounded-button text-xs flex items-center justify-center cursor-pointer">
-<i class="ri-route-line ri-lg mr-1"></i>
-Directions
+<!-- Video card 4 -->
+<div class="video-card group rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=person%20playing%20video%20game%20with%20gaming%20setup%2C%20RGB%20lighting%2C%20gaming%20monitor%2C%20controller%20visible%2C%20streaming%20setup&width=640&height=360&seq=5&orientation=landscape" alt="Video thumbnail" class="w-full aspect-video object-cover object-top">
+<span class="video-duration absolute bottom-2 right-2 px-1.5 py-0.5 text-xs font-medium text-white bg-black/80 rounded">1:05:32</span>
+<div class="video-actions absolute inset-0 bg-black/20 flex items-center justify-center gap-2">
+<button class="play-video p-2 text-white bg-black/50 rounded-full hover:bg-black/70" data-video-id="1_WaSnOnu1Q">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-play-fill"></i>
+</div>
 </button>
-<button onclick="openShareModal()" class="flex-1 bg-gray-50 text-gray-600 py-1.5 rounded-button text-xs flex items-center justify-center cursor-pointer">
-<i class="ri-share-line ri-lg mr-1"></i>
-Share
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-time-line"></i>
+</div>
+</button>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-playlist-add-line"></i>
+</div>
 </button>
 </div>
 </div>
-<!-- Bhandara Card 2 -->
-<div class="bg-white rounded-lg shadow-sm p-4">
-<div class="flex justify-between items-start">
+<div class="p-3">
+<div class="flex gap-3">
+<div class="flex-shrink-0">
+<div class="w-9 h-9 rounded-full bg-red-500 flex items-center justify-center text-white text-xs">
+GG
+</div>
+</div>
 <div>
-<h3 class="font-medium text-gray-800">Hanuman Temple Bhandara</h3>
-<p class="text-xs text-gray-500 mt-1">Ganeshpuri, Sahibabad</p>
+<h3 class="font-medium text-gray-900 line-clamp-2 mb-1">Cyberpunk 2077 Phantom Liberty - Full Gameplay Walkthrough</h3>
+<p class="text-sm text-gray-600">Gaming Guru</p>
+<div class="flex items-center text-xs text-gray-500 mt-1">
+<span>965K views</span>
+<span class="mx-1">•</span>
+<span>5 days ago</span>
 </div>
-<span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">Upcoming</span>
 </div>
-<div class="flex items-center mt-2 text-xs text-gray-600">
-<i class="ri-time-line ri-lg mr-1"></i>
-<span>5:00 PM - 8:00 PM</span>
 </div>
-<div class="flex items-center mt-1 text-xs text-gray-600">
-<i class="ri-calendar-line ri-lg mr-1"></i>
-<span>Today, April 12, 2025</span>
 </div>
-<div class="flex items-center mt-1 text-xs text-gray-600">
-<i class="ri-restaurant-line ri-lg mr-1"></i>
-<span>Chhole, Puri, Raita, Kheer</span>
 </div>
-<div class="flex mt-3 space-x-2">
-<button onclick="openGoogleMaps('Sahibabad, Ghaziabad, Uttar Pradesh')" class="flex-1 bg-blue-50 text-blue-600 py-1.5 rounded-button text-xs flex items-center justify-center cursor-pointer">
-<i class="ri-route-line ri-lg mr-1"></i>
-Directions
+</div>
+</div>
+<!-- Trending videos -->
+<div class="p-4 md:p-6">
+<h2 class="text-xl font-bold text-gray-900 mb-4">Trending</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+<!-- Video card 1 -->
+<div class="video-card group rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=music%20studio%20setup%20with%20instruments%2C%20professional%20audio%20equipment%2C%20microphone%2C%20headphones%2C%20recording%20session%20in%20progress&width=640&height=360&seq=6&orientation=landscape" alt="Video thumbnail" class="w-full aspect-video object-cover object-top">
+<span class="video-duration absolute bottom-2 right-2 px-1.5 py-0.5 text-xs font-medium text-white bg-black/80 rounded">4:21</span>
+<div class="video-actions absolute inset-0 bg-black/20 flex items-center justify-center gap-2">
+<button class="play-video p-2 text-white bg-black/50 rounded-full hover:bg-black/70" data-video-id="1_WaSnOnu1Q">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-play-fill"></i>
+</div>
 </button>
-<button onclick="openShareModal()" class="flex-1 bg-gray-50 text-gray-600 py-1.5 rounded-button text-xs flex items-center justify-center cursor-pointer">
-<i class="ri-share-line ri-lg mr-1"></i>
-Share
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-time-line"></i>
+</div>
+</button>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-playlist-add-line"></i>
+</div>
 </button>
 </div>
 </div>
-<!-- Bhandara Card 3 -->
-<div class="bg-white rounded-lg shadow-sm p-4">
-<div class="flex justify-between items-start">
+<div class="p-3">
+<div class="flex gap-3">
+<div class="flex-shrink-0">
+<div class="w-9 h-9 rounded-full bg-purple-500 flex items-center justify-center text-white text-xs">
+MH
+</div>
+</div>
 <div>
-<h3 class="font-medium text-gray-800">Krishna Temple Bhandara</h3>
-<p class="text-xs text-gray-500 mt-1">Rajendra Nagar, Sahibabad</p>
+<h3 class="font-medium text-gray-900 line-clamp-2 mb-1">Summer Vibes - Official Music Video (2025)</h3>
+<p class="text-sm text-gray-600">Music Hub</p>
+<div class="flex items-center text-xs text-gray-500 mt-1">
+<span>4.8M views</span>
+<span class="mx-1">•</span>
+<span>3 days ago</span>
 </div>
-<span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">Tomorrow</span>
 </div>
-<div class="flex items-center mt-2 text-xs text-gray-600">
-<i class="ri-time-line ri-lg mr-1"></i>
-<span>12:00 PM - 3:00 PM</span>
 </div>
-<div class="flex items-center mt-1 text-xs text-gray-600">
-<i class="ri-calendar-line ri-lg mr-1"></i>
-<span>April 13, 2025</span>
 </div>
-<div class="flex items-center mt-1 text-xs text-gray-600">
-<i class="ri-restaurant-line ri-lg mr-1"></i>
-<span>Pulao, Paneer, Roti, Gulab Jamun</span>
 </div>
-<div class="flex mt-3 space-x-2">
-<button onclick="openGoogleMaps('Sahibabad, Ghaziabad, Uttar Pradesh')" class="flex-1 bg-blue-50 text-blue-600 py-1.5 rounded-button text-xs flex items-center justify-center cursor-pointer">
-<i class="ri-route-line ri-lg mr-1"></i>
-Directions
+<!-- Video card 2 -->
+<div class="video-card group rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=travel%20vlog%20in%20exotic%20location%2C%20beautiful%20landscape%2C%20person%20with%20camera%2C%20travel%20gear%2C%20cinematic%20shot&width=640&height=360&seq=7&orientation=landscape" alt="Video thumbnail" class="w-full aspect-video object-cover object-top">
+<span class="video-duration absolute bottom-2 right-2 px-1.5 py-0.5 text-xs font-medium text-white bg-black/80 rounded">22:17</span>
+<div class="video-actions absolute inset-0 bg-black/20 flex items-center justify-center gap-2">
+<button class="play-video p-2 text-white bg-black/50 rounded-full hover:bg-black/70" data-video-id="1_WaSnOnu1Q">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-play-fill"></i>
+</div>
 </button>
-<button onclick="openShareModal()" class="flex-1 bg-gray-50 text-gray-600 py-1.5 rounded-button text-xs flex items-center justify-center cursor-pointer">
-<i class="ri-share-line ri-lg mr-1"></i>
-Share
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-time-line"></i>
+</div>
+</button>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-playlist-add-line"></i>
+</div>
 </button>
 </div>
 </div>
-</div>
-<!-- Map View (Hidden initially) -->
-<div id="mapView" class="hidden">
-<div class="bg-white rounded-lg shadow-sm p-4 h-64 relative overflow-hidden">
-<img src="https://public.readdy.ai/gen_page/map_placeholder_1280x720.png" alt="Map" class="absolute inset-0 w-full h-full object-cover">
-<div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
-<div class="bg-white p-3 rounded-lg shadow-lg">
-<p class="text-sm font-medium">3 Bhandaras Found</p>
-<p class="text-xs text-gray-500">Tap on markers to view details</p>
+<div class="p-3">
+<div class="flex gap-3">
+<div class="flex-shrink-0">
+<div class="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs">
+TT
 </div>
 </div>
+<div>
+<h3 class="font-medium text-gray-900 line-clamp-2 mb-1">Hidden Gems of Bali - Complete Travel Guide 2025</h3>
+<p class="text-sm text-gray-600">Travel Tips</p>
+<div class="flex items-center text-xs text-gray-500 mt-1">
+<span>1.7M views</span>
+<span class="mx-1">•</span>
+<span>1 week ago</span>
 </div>
 </div>
-</section>
+</div>
+</div>
+</div>
+<!-- Video card 3 -->
+<div class="video-card group rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=science%20experiment%20in%20laboratory%2C%20researcher%20with%20test%20tubes%2C%20scientific%20equipment%2C%20educational%20demonstration%2C%20high%20quality&width=640&height=360&seq=8&orientation=landscape" alt="Video thumbnail" class="w-full aspect-video object-cover object-top">
+<span class="video-duration absolute bottom-2 right-2 px-1.5 py-0.5 text-xs font-medium text-white bg-black/80 rounded">15:09</span>
+<div class="video-actions absolute inset-0 bg-black/20 flex items-center justify-center gap-2">
+<button class="play-video p-2 text-white bg-black/50 rounded-full hover:bg-black/70" data-video-id="1_WaSnOnu1Q">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-play-fill"></i>
+</div>
+</button>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-time-line"></i>
+</div>
+</button>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-playlist-add-line"></i>
+</div>
+</button>
+</div>
+</div>
+<div class="p-3">
+<div class="flex gap-3">
+<div class="flex-shrink-0">
+<div class="w-9 h-9 rounded-full bg-indigo-500 flex items-center justify-center text-white text-xs">
+SL
+</div>
+</div>
+<div>
+<h3 class="font-medium text-gray-900 line-clamp-2 mb-1">10 Mind-Blowing Science Experiments You Can Do At Home</h3>
+<p class="text-sm text-gray-600">Science Lab</p>
+<div class="flex items-center text-xs text-gray-500 mt-1">
+<span>3.2M views</span>
+<span class="mx-1">•</span>
+<span>2 weeks ago</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Video card 4 -->
+<div class="video-card group rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=fashion%20photoshoot%2C%20stylish%20clothing%2C%20professional%20model%2C%20studio%20lighting%2C%20fashion%20photography%20setup&width=640&height=360&seq=9&orientation=landscape" alt="Video thumbnail" class="w-full aspect-video object-cover object-top">
+<span class="video-duration absolute bottom-2 right-2 px-1.5 py-0.5 text-xs font-medium text-white bg-black/80 rounded">8:43</span>
+<div class="video-actions absolute inset-0 bg-black/20 flex items-center justify-center gap-2">
+<button class="play-video p-2 text-white bg-black/50 rounded-full hover:bg-black/70" data-video-id="1_WaSnOnu1Q">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-play-fill"></i>
+</div>
+</button>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-time-line"></i>
+</div>
+</button>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-playlist-add-line"></i>
+</div>
+</button>
+</div>
+</div>
+<div class="p-3">
+<div class="flex gap-3">
+<div class="flex-shrink-0">
+<div class="w-9 h-9 rounded-full bg-pink-500 flex items-center justify-center text-white text-xs">
+FS
+</div>
+</div>
+<div>
+<h3 class="font-medium text-gray-900 line-clamp-2 mb-1">Spring Fashion Trends 2025 - What's In & What's Out</h3>
+<p class="text-sm text-gray-600">Fashion Spot</p>
+<div class="flex items-center text-xs text-gray-500 mt-1">
+<span>1.5M views</span>
+<span class="mx-1">•</span>
+<span>4 days ago</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recently uploaded -->
+<div class="p-4 md:p-6">
+<h2 class="text-xl font-bold text-gray-900 mb-4">Recently Uploaded</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+<!-- Video card 1 -->
+<div class="video-card group rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=business%20presentation%20in%20modern%20office%2C%20professional%20speaker%2C%20audience%20listening%2C%20corporate%20environment%2C%20high%20quality&width=640&height=360&seq=10&orientation=landscape" alt="Video thumbnail" class="w-full aspect-video object-cover object-top">
+<span class="video-duration absolute bottom-2 right-2 px-1.5 py-0.5 text-xs font-medium text-white bg-black/80 rounded">32:18</span>
+<div class="video-actions absolute inset-0 bg-black/20 flex items-center justify-center gap-2">
+<button class="play-video p-2 text-white bg-black/50 rounded-full hover:bg-black/70" data-video-id="1_WaSnOnu1Q">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-play-fill"></i>
+</div>
+</button>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-time-line"></i>
+</div>
+</button>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-playlist-add-line"></i>
+</div>
+</button>
+</div>
+</div>
+<div class="p-3">
+<div class="flex gap-3">
+<div class="flex-shrink-0">
+<div class="w-9 h-9 rounded-full bg-teal-500 flex items-center justify-center text-white text-xs">
+BS
+</div>
+</div>
+<div>
+<h3 class="font-medium text-gray-900 line-clamp-2 mb-1">How to Give a Presentation That Actually Gets Results</h3>
+<p class="text-sm text-gray-600">Business Success</p>
+<div class="flex items-center text-xs text-gray-500 mt-1">
+<span>245K views</span>
+<span class="mx-1">•</span>
+<span>12 hours ago</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Video card 2 -->
+<div class="video-card group rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=drone%20aerial%20footage%20of%20beautiful%20landscape%2C%20cinematic%20shot%2C%20professional%20camera%20equipment%2C%20high%20altitude%20view&width=640&height=360&seq=11&orientation=landscape" alt="Video thumbnail" class="w-full aspect-video object-cover object-top">
+<span class="video-duration absolute bottom-2 right-2 px-1.5 py-0.5 text-xs font-medium text-white bg-black/80 rounded">10:54</span>
+<div class="video-actions absolute inset-0 bg-black/20 flex items-center justify-center gap-2">
+<button class="play-video p-2 text-white bg-black/50 rounded-full hover:bg-black/70" data-video-id="1_WaSnOnu1Q">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-play-fill"></i>
+</div>
+</button>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-time-line"></i>
+</div>
+</button>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-playlist-add-line"></i>
+</div>
+</button>
+</div>
+</div>
+<div class="p-3">
+<div class="flex gap-3">
+<div class="flex-shrink-0">
+<div class="w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs">
+DP
+</div>
+</div>
+<div>
+<h3 class="font-medium text-gray-900 line-clamp-2 mb-1">Drone Photography Masterclass - Capture Stunning Aerial Footage</h3>
+<p class="text-sm text-gray-600">Drone Pros</p>
+<div class="flex items-center text-xs text-gray-500 mt-1">
+<span>187K views</span>
+<span class="mx-1">•</span>
+<span>1 day ago</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Video card 3 -->
+<div class="video-card group rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=cryptocurrency%20trading%20setup%2C%20multiple%20monitors%20with%20charts%2C%20financial%20data%20visualization%2C%20professional%20trading%20desk&width=640&height=360&seq=12&orientation=landscape" alt="Video thumbnail" class="w-full aspect-video object-cover object-top">
+<span class="video-duration absolute bottom-2 right-2 px-1.5 py-0.5 text-xs font-medium text-white bg-black/80 rounded">27:35</span>
+<div class="video-actions absolute inset-0 bg-black/20 flex items-center justify-center gap-2">
+<button class="play-video p-2 text-white bg-black/50 rounded-full hover:bg-black/70" data-video-id="1_WaSnOnu1Q">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-play-fill"></i>
+</div>
+</button>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-time-line"></i>
+</div>
+</button>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-playlist-add-line"></i>
+</div>
+</button>
+</div>
+</div>
+<div class="p-3">
+<div class="flex gap-3">
+<div class="flex-shrink-0">
+<div class="w-9 h-9 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs">
+CF
+</div>
+</div>
+<div>
+<h3 class="font-medium text-gray-900 line-clamp-2 mb-1">Cryptocurrency Market Analysis - April 2025 Predictions</h3>
+<p class="text-sm text-gray-600">Crypto Finance</p>
+<div class="flex items-center text-xs text-gray-500 mt-1">
+<span>325K views</span>
+<span class="mx-1">•</span>
+<span>18 hours ago</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Video card 4 -->
+<div class="video-card group rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+<div class="relative">
+<img src="https://readdy.ai/api/search-image?query=DIY%20home%20improvement%20project%2C%20person%20installing%20shelves%2C%20tools%20visible%2C%20modern%20home%20interior%2C%20instructional%20setup&width=640&height=360&seq=13&orientation=landscape" alt="Video thumbnail" class="w-full aspect-video object-cover object-top">
+<span class="video-duration absolute bottom-2 right-2 px-1.5 py-0.5 text-xs font-medium text-white bg-black/80 rounded">14:22</span>
+<div class="video-actions absolute inset-0 bg-black/20 flex items-center justify-center gap-2">
+<button class="play-video p-2 text-white bg-black/50 rounded-full hover:bg-black/70" data-video-id="1_WaSnOnu1Q">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-play-fill"></i>
+</div>
+</button>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-time-line"></i>
+</div>
+</button>
+<button class="p-2 text-white bg-black/50 rounded-full hover:bg-black/70">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-playlist-add-line"></i>
+</div>
+</button>
+</div>
+</div>
+<div class="p-3">
+<div class="flex gap-3">
+<div class="flex-shrink-0">
+<div class="w-9 h-9 rounded-full bg-amber-500 flex items-center justify-center text-white text-xs">
+DH
+</div>
+</div>
+<div>
+<h3 class="font-medium text-gray-900 line-clamp-2 mb-1">10 Weekend DIY Projects to Transform Your Home</h3>
+<p class="text-sm text-gray-600">DIY Home</p>
+<div class="flex items-center text-xs text-gray-500 mt-1">
+<span>156K views</span>
+<span class="mx-1">•</span>
+<span>2 days ago</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </main>
-<!-- Tab Bar -->
-<div class="fixed bottom-0 w-full bg-white border-t border-gray-200 shadow-md z-50">
-<div class="grid grid-cols-5 h-16">
-<div class="flex flex-col items-center justify-center cursor-pointer text-primary">
+</div>
+<div id="videoModal" class="fixed inset-0 z-50 hidden">
+<div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+<div class="relative w-full max-w-6xl mx-auto mt-10 bg-white rounded-lg shadow-xl">
+<button id="closeModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
 <div class="w-6 h-6 flex items-center justify-center">
-<i class="ri-home-5-fill ri-lg"></i>
+<i class="ri-close-line text-xl"></i>
 </div>
-<span class="text-xs mt-1">Home</span>
+</button>
+<div class="p-4">
+<div class="relative pb-[56.25%] overflow-hidden rounded-lg">
+<iframe id="videoPlayer" class="absolute top-0 left-0 w-full h-full" frameborder="0" allowfullscreen></iframe>
 </div>
-<div class="flex flex-col items-center justify-center cursor-pointer text-gray-500">
+<div class="mt-4">
+<div class="flex items-center justify-between">
+<h2 id="videoTitle" class="text-xl font-bold text-gray-900"></h2>
+<div class="flex items-center gap-4">
+<button class="like-btn flex items-center gap-2 text-gray-700 hover:text-primary">
 <div class="w-6 h-6 flex items-center justify-center">
-<i class="ri-map-pin-line ri-lg"></i>
+<i class="ri-thumb-up-line"></i>
 </div>
-<span class="text-xs mt-1">Explore</span>
-</div>
-<div class="flex flex-col items-center justify-center cursor-pointer text-gray-500" onclick="openDonateModal()">
-<div class="w-8 h-8 flex items-center justify-center bg-primary rounded-full">
-<i class="ri-heart-fill ri-lg text-white"></i>
-</div>
-<span class="text-xs mt-1 text-primary font-medium">Donate</span>
-</div>
-<div class="flex flex-col items-center justify-center cursor-pointer text-gray-500">
+<span class="like-count">0</span>
+</button>
+<button class="flex items-center gap-2 text-gray-700 hover:text-primary">
 <div class="w-6 h-6 flex items-center justify-center">
-<i class="ri-calendar-line ri-lg"></i>
+<i class="ri-share-line"></i>
 </div>
-<span class="text-xs mt-1">Events</span>
+<span>Share</span>
+</button>
+<button class="follow-btn px-4 py-1.5 text-sm font-medium text-white bg-primary rounded-full !rounded-button hover:bg-primary/90">
+Follow
+</button>
 </div>
-<div class="flex flex-col items-center justify-center cursor-pointer text-gray-500">
-<div class="w-6 h-6 flex items-center justify-center">
-<i class="ri-user-line ri-lg"></i>
 </div>
-<span class="text-xs mt-1">Profile</span>
+<div class="mt-4 flex items-start gap-4">
+<div class="flex-shrink-0">
+<div id="channelAvatar" class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500"></div>
+</div>
+<div class="flex-1">
+<h3 id="channelName" class="font-medium text-gray-900"></h3>
+<p id="videoDescription" class="mt-2 text-gray-700"></p>
+<div class="mt-4">
+<div class="flex items-center gap-2 text-sm text-gray-500">
+<span id="videoViews"></span>
+<span>•</span>
+<span id="videoDate"></span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-medium text-gray-900">Comments</h3>
+<div class="flex items-center gap-2">
+<span class="text-sm text-gray-500" id="commentCount">0 comments</span>
+<button class="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-700 bg-gray-100 rounded-full !rounded-button hover:bg-gray-200">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-sort-desc"></i>
+</div>
+<span>Sort by</span>
+</button>
+</div>
+</div>
+<div class="flex items-start gap-4 mb-6">
+<div class="flex-shrink-0">
+<div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs">
+JD
+</div>
+</div>
+<div class="flex-1">
+<textarea id="commentInput" class="w-full p-3 text-sm bg-gray-100 border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none" rows="3" placeholder="Add a comment..."></textarea>
+<div class="mt-2 flex items-center justify-between">
+<span id="charCount" class="text-xs text-gray-500">0/500</span>
+<div class="flex items-center gap-2">
+<button id="cancelComment" class="px-4 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-full !rounded-button hover:bg-gray-200 hidden">
+Cancel
+</button>
+<button id="submitComment" class="px-4 py-1.5 text-sm font-medium text-white bg-primary rounded-full !rounded-button hover:bg-primary/90 opacity-50 cursor-not-allowed" disabled>
+Comment
+</button>
+</div>
+</div>
+</div>
+</div>
+<div id="commentsList" class="space-y-6">
+<!-- Example comments -->
+<div class="flex items-start gap-4">
+<div class="flex-shrink-0">
+<div class="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center text-xs">
+EW
+</div>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="font-medium text-gray-900">Emily Wilson</span>
+<span class="text-xs text-gray-500">2 hours ago</span>
+</div>
+<p class="text-gray-700">Great video! The editing techniques you shared are really helpful. I've been struggling with color grading and this tutorial made it much clearer.</p>
+<div class="flex items-center gap-4 mt-2">
+<button class="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-thumb-up-line"></i>
+</div>
+<span>124</span>
+</button>
+<button class="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-thumb-down-line"></i>
+</div>
+</button>
+<button class="text-sm text-gray-500 hover:text-gray-700">Reply</button>
+</div>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="flex-shrink-0">
+<div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center text-xs">
+MR
+</div>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="font-medium text-gray-900">Michael Rodriguez</span>
+<span class="text-xs text-gray-500">5 hours ago</span>
+</div>
+<p class="text-gray-700">Would love to see a follow-up video on advanced transitions and effects. Your tutorials are always so detailed and easy to follow!</p>
+<div class="flex items-center gap-4 mt-2">
+<button class="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-thumb-up-line"></i>
+</div>
+<span>89</span>
+</button>
+<button class="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-thumb-down-line"></i>
+</div>
+</button>
+<button class="text-sm text-gray-500 hover:text-gray-700">Reply</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <script>
-function openGoogleMaps(location) {
-const encodedLocation = encodeURIComponent(location);
-window.open(`https://www.google.com/maps/search/?api=1&query=${encodedLocation}`, '_blank');
-}
-function openShareModal() {
-document.getElementById('shareModal').classList.remove('hidden');
-}
-function closeShareModal() {
-document.getElementById('shareModal').classList.add('hidden');
-}
-// Donation Modal Functions
-function openDonateModal() {
-document.getElementById('donateModal').classList.remove('hidden');
-}
-function closeDonateModal() {
-document.getElementById('donateModal').classList.add('hidden');
-}
-function selectAmount(amount) {
-const customInput = document.getElementById('customAmount');
-customInput.value = amount;
-}
 document.addEventListener('DOMContentLoaded', function() {
-// Location data
-const locationData = {
-"Delhi": {
-districts: ["North Delhi", "South Delhi", "East Delhi", "West Delhi", "Central Delhi"],
-areas: {
-"North Delhi": ["Rohini", "Model Town", "Ashok Vihar", "Pitampura"],
-"South Delhi": ["Saket", "Hauz Khas", "Green Park", "Malviya Nagar"],
-"East Delhi": ["Laxmi Nagar", "Mayur Vihar", "Preet Vihar", "Shahdara"],
-"West Delhi": ["Janakpuri", "Dwarka", "Paschim Vihar", "Rajouri Garden"],
-"Central Delhi": ["Connaught Place", "Karol Bagh", "Paharganj", "New Delhi"]
-}
-},
-"Uttar Pradesh": {
-districts: ["Ghaziabad", "Noida", "Varanasi", "Lucknow", "Agra"],
-areas: {
-"Ghaziabad": ["Sahibabad", "Rajendra Nagar", "Ganeshpuri", "Indirapuram", "Vaishali"],
-"Noida": ["Sector 18", "Sector 62", "Sector 125", "Sector 142", "Greater Noida"],
-"Varanasi": ["Dashashwamedh", "Godowlia", "Lanka", "Assi", "Bhelupur"],
-"Lucknow": ["Hazratganj", "Gomti Nagar", "Aliganj", "Indira Nagar", "Chowk"],
-"Agra": ["Tajganj", "Sadar Bazaar", "Sikandra", "Kamla Nagar", "Civil Lines"]
-}
-},
-"Bihar": {
-districts: ["Patna", "Gaya", "Muzaffarpur", "Bhagalpur", "Darbhanga"],
-areas: {
-"Patna": ["Patna City", "Danapur", "Phulwari Sharif", "Kankarbagh", "Rajendra Nagar"],
-"Gaya": ["Bodh Gaya", "AP Colony", "Manpur", "Civil Lines", "Gaya Town"],
-"Muzaffarpur": ["Mithanpura", "Brahampura", "Juran Chapra", "Saraiya", "Bela"],
-"Bhagalpur": ["Tilkamanjhi", "Nathnagar", "Barari", "Ishakchak", "Sabour"],
-"Darbhanga": ["Laheriasarai", "Lalbagh", "Donar", "Allalpatti", "Mirzapur"]
-}
-}
-};
-// Dropdown functionality
-function setupDropdown(btnId, dropdownId) {
-const btn = document.getElementById(btnId);
-const dropdown = document.getElementById(dropdownId);
-btn.addEventListener('click', function() {
-dropdown.classList.toggle('show');
+const sidebarToggle = document.getElementById('sidebar-toggle');
+const sidebar = document.getElementById('sidebar');
+const searchButton = document.querySelector('.md\\:hidden [class*="ri-search-line"]').parentElement.parentElement;
+const mobileSearch = document.getElementById('mobile-search');
+const videoModal = document.getElementById('videoModal');
+const videoPlayer = document.getElementById('videoPlayer');
+const closeModal = document.getElementById('closeModal');
+const likeBtn = document.querySelector('.like-btn');
+const likeCount = document.querySelector('.like-count');
+const followBtn = document.querySelector('.follow-btn');
+const commentInput = document.getElementById('commentInput');
+const charCount = document.getElementById('charCount');
+const submitComment = document.getElementById('submitComment');
+const cancelComment = document.getElementById('cancelComment');
+const commentsList = document.getElementById('commentsList');
+const commentCount = document.getElementById('commentCount');
+let isLiked = false;
+let isFollowing = false;
+let totalComments = 2; // Initial comments count
+sidebarToggle.addEventListener('click', function() {
+sidebar.classList.toggle('-translate-x-full');
 });
-// Close dropdown when clicking outside
-window.addEventListener('click', function(e) {
-if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
-dropdown.classList.remove('show');
-}
+searchButton.addEventListener('click', function() {
+mobileSearch.classList.toggle('hidden');
 });
-}
-setupDropdown('stateDropdownBtn', 'stateDropdown');
-setupDropdown('districtDropdownBtn', 'districtDropdown');
-setupDropdown('areaDropdownBtn', 'areaDropdown');
-// State selection
-const stateOptions = document.querySelectorAll('#stateDropdown [data-value]');
-stateOptions.forEach(option => {
-option.addEventListener('click', function() {
-const state = this.getAttribute('data-value');
-document.getElementById('stateSelected').textContent = state;
-document.getElementById('stateDropdown').classList.remove('show');
-// Show district dropdown and populate options
-document.getElementById('districtContainer').classList.remove('hidden');
-document.getElementById('districtSelected').textContent = 'Select District';
-document.getElementById('areaContainer').classList.add('hidden');
-const districtOptions = document.getElementById('districtOptions');
-districtOptions.innerHTML = '';
-locationData[state].districts.forEach(district => {
-const div = document.createElement('div');
-div.className = 'px-3 py-2 hover:bg-orange-50 cursor-pointer text-sm';
-div.setAttribute('data-value', district);
-div.textContent = district;
-div.addEventListener('click', function() {
-const selectedDistrict = this.getAttribute('data-value');
-document.getElementById('districtSelected').textContent = selectedDistrict;
-document.getElementById('districtDropdown').classList.remove('show');
-// Show area dropdown and populate options
-document.getElementById('areaContainer').classList.remove('hidden');
-document.getElementById('areaSelected').textContent = 'Select Area';
-const areaOptions = document.getElementById('areaOptions');
-areaOptions.innerHTML = '';
-locationData[state].areas[selectedDistrict].forEach(area => {
-const areaDiv = document.createElement('div');
-areaDiv.className = 'px-3 py-2 hover:bg-orange-50 cursor-pointer text-sm';
-areaDiv.setAttribute('data-value', area);
-areaDiv.textContent = area;
-areaDiv.addEventListener('click', function() {
-document.getElementById('areaSelected').textContent = this.getAttribute('data-value');
-document.getElementById('areaDropdown').classList.remove('show');
-});
-areaOptions.appendChild(areaDiv);
+document.querySelectorAll('.play-video').forEach(button => {
+button.addEventListener('click', function() {
+const videoId = this.dataset.videoId;
+videoPlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+videoModal.classList.remove('hidden');
+// Set video details
+const card = this.closest('.video-card');
+document.getElementById('videoTitle').textContent = card.querySelector('h3').textContent;
+document.getElementById('channelName').textContent = card.querySelector('p').textContent;
+document.getElementById('videoViews').textContent = card.querySelector('.text-gray-500 span:first-child').textContent;
+document.getElementById('videoDate').textContent = card.querySelector('.text-gray-500 span:last-child').textContent;
+document.getElementById('channelAvatar').className = card.querySelector('.rounded-full').className;
+document.getElementById('channelAvatar').textContent = card.querySelector('.rounded-full').textContent;
+// Sample description
+document.getElementById('videoDescription').textContent = 'This is a detailed description of the video. It provides context and information about the content.';
 });
 });
-districtOptions.appendChild(div);
+closeModal.addEventListener('click', function() {
+videoModal.classList.add('hidden');
+videoPlayer.src = '';
 });
-});
-});
-// Timing filter
-const timingBtns = document.querySelectorAll('.timing-btn');
-timingBtns.forEach(btn => {
-btn.addEventListener('click', function() {
-timingBtns.forEach(b => b.classList.remove('bg-primary', 'text-white'));
-timingBtns.forEach(b => b.classList.add('bg-white', 'border-gray-200'));
-this.classList.remove('bg-white', 'border-gray-200');
-this.classList.add('bg-primary', 'text-white');
-});
-});
-// Find Bhandara button
-document.getElementById('findBhandaraBtn').addEventListener('click', function() {
-const state = document.getElementById('stateSelected').textContent;
-const district = document.getElementById('districtSelected').textContent;
-const area = document.getElementById('areaSelected').textContent;
-const selectedTime = document.querySelector('.timing-btn.bg-primary')?.getAttribute('data-time');
-if (state === 'Select State') {
-const customAlert = document.createElement('div');
-customAlert.className = 'fixed inset-0 flex items-center justify-center z-50';
-customAlert.innerHTML = `
-<div class="absolute inset-0 bg-black bg-opacity-50"></div>
-<div class="bg-white rounded-lg p-4 shadow-lg z-10 mx-4 w-full max-w-xs">
-<div class="text-center">
-<div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-3">
-<i class="ri-error-warning-line ri-xl text-orange-500"></i>
-</div>
-<h3 class="text-lg font-medium text-gray-900 mb-2">Location Required</h3>
-<p class="text-sm text-gray-600 mb-4">Please select a state to find Bhandaras.</p>
-<button class="bg-primary text-white py-2 px-4 rounded-button w-full">OK</button>
-</div>
-</div>
-`;
-document.body.appendChild(customAlert);
-customAlert.querySelector('button').addEventListener('click', function() {
-document.body.removeChild(customAlert);
-});
-return;
-}
-// Show results section
-document.getElementById('resultsSection').classList.remove('hidden');
-// Scroll to results
-document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
-});
-// Toggle between list and map views
-const viewToggleBtns = document.querySelectorAll('.view-toggle-btn');
-viewToggleBtns.forEach(btn => {
-btn.addEventListener('click', function() {
-viewToggleBtns.forEach(b => b.classList.remove('active', 'bg-primary', 'text-white'));
-viewToggleBtns.forEach(b => b.classList.add('bg-gray-100'));
-this.classList.remove('bg-gray-100');
-this.classList.add('active', 'bg-primary', 'text-white');
-const view = this.getAttribute('data-view');
-if (view === 'list') {
-document.getElementById('listView').classList.remove('hidden');
-document.getElementById('mapView').classList.add('hidden');
+likeBtn.addEventListener('click', function() {
+isLiked = !isLiked;
+const icon = this.querySelector('i');
+if (isLiked) {
+icon.className = 'ri-thumb-up-fill';
+likeCount.textContent = parseInt(likeCount.textContent) + 1;
 } else {
-document.getElementById('listView').classList.add('hidden');
-document.getElementById('mapView').classList.remove('hidden');
+icon.className = 'ri-thumb-up-line';
+likeCount.textContent = parseInt(likeCount.textContent) - 1;
 }
 });
+followBtn.addEventListener('click', function() {
+isFollowing = !isFollowing;
+if (isFollowing) {
+this.textContent = 'Following';
+this.classList.add('bg-gray-200', 'text-gray-700');
+this.classList.remove('bg-primary', 'text-white');
+} else {
+this.textContent = 'Follow';
+this.classList.remove('bg-gray-200', 'text-gray-700');
+this.classList.add('bg-primary', 'text-white');
+}
+});
+// Comment functionality
+commentInput.addEventListener('input', function() {
+    const length = this.value.trim().length;
+    charCount.textContent = `${length}/500`;
+    
+    if (length > 0 && length <= 500) {
+        submitComment.disabled = false;
+        submitComment.classList.remove('opacity-50', 'cursor-not-allowed');
+        cancelComment.classList.remove('hidden');
+    } else {
+        submitComment.disabled = true;
+        submitComment.classList.add('opacity-50', 'cursor-not-allowed');
+        if (length === 0) {
+            cancelComment.classList.add('hidden');
+        }
+    }
+});
+cancelComment.addEventListener('click', function() {
+    commentInput.value = '';
+    charCount.textContent = '0/500';
+    submitComment.disabled = true;
+    submitComment.classList.add('opacity-50', 'cursor-not-allowed');
+    this.classList.add('hidden');
+});
+submitComment.addEventListener('click', function() {
+    if (commentInput.value.trim()) {
+        const newComment = document.createElement('div');
+        newComment.className = 'flex items-start gap-4';
+        
+        const now = new Date();
+        const timeAgo = 'just now';
+        
+        newComment.innerHTML = `
+            <div class="flex-shrink-0">
+                <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs">
+                    JD
+                </div>
+            </div>
+            <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="font-medium text-gray-900">John Doe</span>
+                    <span class="text-xs text-gray-500">${timeAgo}</span>
+                </div>
+                <p class="text-gray-700">${commentInput.value}</p>
+                <div class="flex items-center gap-4 mt-2">
+                    <button class="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+                        <div class="w-4 h-4 flex items-center justify-center">
+                            <i class="ri-thumb-up-line"></i>
+                        </div>
+                        <span>0</span>
+                    </button>
+                    <button class="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+                        <div class="w-4 h-4 flex items-center justify-center">
+                            <i class="ri-thumb-down-line"></i>
+                        </div>
+                    </button>
+                    <button class="text-sm text-gray-500 hover:text-gray-700">Reply</button>
+                </div>
+            </div>
+        `;
+        
+        commentsList.insertBefore(newComment, commentsList.firstChild);
+        
+        // Update comment count
+        totalComments++;
+        commentCount.textContent = `${totalComments} comments`;
+        
+        // Reset input
+        commentInput.value = '';
+        charCount.textContent = '0/500';
+        submitComment.disabled = true;
+        submitComment.classList.add('opacity-50', 'cursor-not-allowed');
+        cancelComment.classList.add('hidden');
+        
+        // Show success message
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transform transition-transform duration-300 translate-y-0';
+        toast.textContent = 'Comment posted successfully!';
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('translate-y-full');
+            setTimeout(() => toast.remove(), 300);
+        }, 2000);
+    }
+});
+// Initialize comment count
+commentCount.textContent = `${totalComments} comments`;
+// Add like functionality to existing comments
+document.querySelectorAll('#commentsList button').forEach(button => {
+    if (button.querySelector('.ri-thumb-up-line')) {
+        button.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            const count = this.querySelector('span');
+            if (icon.className === 'ri-thumb-up-line') {
+                icon.className = 'ri-thumb-up-fill';
+                count.textContent = parseInt(count.textContent) + 1;
+            } else {
+                icon.className = 'ri-thumb-up-line';
+                count.textContent = parseInt(count.textContent) - 1;
+            }
+        });
+    }
 });
 });
 </script>
